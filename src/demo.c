@@ -81,6 +81,7 @@ int main( int argc, char * argv[] )
     char * pFileName;
     char Command[1000];
     clock_t clkRead, clkResyn, clkVer, clk;
+    printf("\n");
 
     //////////////////////////////////////////////////////////////////////////
     // get the input file name
@@ -100,6 +101,7 @@ clk = clock();
     //////////////////////////////////////////////////////////////////////////
     // read the file
     sprintf( Command, "read %s", pFileName );
+    printf(">> read %s\n", pFileName );
     if ( Cmd_CommandExecute( pAbc, Command ) )
     {
         fprintf( stdout, "Cannot execute command \"%s\".\n", Command );
@@ -109,6 +111,7 @@ clk = clock();
     //////////////////////////////////////////////////////////////////////////
     // balance
     sprintf( Command, "balance" );
+    printf(">> balance\n" );
     if ( Cmd_CommandExecute( pAbc, Command ) )
     {
         fprintf( stdout, "Cannot execute command \"%s\".\n", Command );
@@ -121,6 +124,7 @@ clkRead = clock() - clk;
     if ( fPrintStats )
     {
         sprintf( Command, "print_stats" );
+        printf(">> print_stats\n");
         if ( Cmd_CommandExecute( pAbc, Command ) )
         {
             fprintf( stdout, "Cannot execute command \"%s\".\n", Command );
@@ -134,6 +138,7 @@ clk = clock();
     if ( fUseResyn2 )
     {
         sprintf( Command, "balance; rewrite -l; refactor -l; balance; rewrite -l; rewrite -lz; balance; refactor -lz; rewrite -lz; balance" );
+        printf( ">> balance; rewrite -l; refactor -l; balance; rewrite -l; rewrite -lz; balance; refactor -lz; rewrite -lz; balance\n" );
         if ( Cmd_CommandExecute( pAbc, Command ) )
         {
             fprintf( stdout, "Cannot execute command \"%s\".\n", Command );
@@ -143,6 +148,7 @@ clk = clock();
     else
     {
         sprintf( Command, "balance; rewrite -l; rewrite -lz; balance; rewrite -lz; balance" );
+        printf( ">> balance; rewrite -l; rewrite -lz; balance; rewrite -lz; balance\n" );
         if ( Cmd_CommandExecute( pAbc, Command ) )
         {
             fprintf( stdout, "Cannot execute command \"%s\".\n", Command );
@@ -156,6 +162,7 @@ clkResyn = clock() - clk;
     if ( fPrintStats )
     {
         sprintf( Command, "print_stats" );
+        printf( ">> print_stats\n" );
         if ( Cmd_CommandExecute( pAbc, Command ) )
         {
             fprintf( stdout, "Cannot execute command \"%s\".\n", Command );
@@ -166,6 +173,7 @@ clkResyn = clock() - clk;
     //////////////////////////////////////////////////////////////////////////
     // write the result in blif
     sprintf( Command, "write_blif result.blif" );
+    printf( ">> write_blif result.blif\n" );
     if ( Cmd_CommandExecute( pAbc, Command ) )
     {
         fprintf( stdout, "Cannot execute command \"%s\".\n", Command );
@@ -178,6 +186,7 @@ clk = clock();
     if ( fVerify )
     {
         sprintf( Command, "cec %s result.blif", pFileName );
+        printf( ">> cec %s result.blif\n", pFileName );
         if ( Cmd_CommandExecute( pAbc, Command ) )
         {
             fprintf( stdout, "Cannot execute command \"%s\".\n", Command );
