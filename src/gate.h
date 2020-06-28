@@ -31,7 +31,7 @@ enum gate_type{
     MUX
 };
 
-void gate_blif(GATE g, vector<string>& IOname, fstream& out_stream)
+void gate_blif(GATE g, vector<string>& IOname, fstream& outFile)
 {
     
 }
