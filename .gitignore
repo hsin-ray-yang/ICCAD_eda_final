@@ -34,4 +34,4 @@
 src/*.o
 
 **/.DS_store
-
+.vscode
