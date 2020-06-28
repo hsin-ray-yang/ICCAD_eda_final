@@ -1,5 +1,5 @@
-# Benchmark "./i10" written by ABC on Fri Jun 26 15:06:56 2020
-.model ./i10
+# Benchmark "i10" written by ABC on Sat Jun 27 21:26:05 2020
+.model i10
 .inputs V32(0) V32(1) V32(2) V32(3) V56(0) V289(0) V10(0) V13(0) V35(0) \
  V203(0) V288(6) V288(7) V248(0) V249(0) V62(0) V59(0) V174(0) V215(0) \
  V66(0) V70(0) V43(0) V214(0) V37(0) V271(0) V40(0) V45(0) V149(7) V149(6) \

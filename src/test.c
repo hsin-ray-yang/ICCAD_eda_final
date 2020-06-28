@@ -77,6 +77,7 @@ int main( int argc, char * argv[] )
     Abc_Frame_t * pAbc;
     char Command[1000];
     clock_t  clk, clkend;
+    char exit = 'y';
 
     //////////////////////////////////////////////////////////////////////////
     // start the ABC framework
@@ -92,9 +93,15 @@ int main( int argc, char * argv[] )
         if ( Cmd_CommandExecute( pAbc, Command ) )
         {
             fprintf( stdout, "Cannot execute command \"%s\".\n", Command );
+            printf("continue?(y/n)");
+            scanf("%c",&exit);
+            if(exit == 'n'){
+                break;
+            }
+
         }
         clkend = clock() - clk;
-        printf("---------\nuse %.3f seconds.\n",(float)clkend/1000 );
+        printf("---------\nuse %.3f seconds.\n",(float)clkend/1000000 );
     }
 
 
