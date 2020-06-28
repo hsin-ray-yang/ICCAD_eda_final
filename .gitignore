@@ -32,7 +32,6 @@
 *.app
 
 src/*.o
-*.blif
 
 **/.DS_store
 

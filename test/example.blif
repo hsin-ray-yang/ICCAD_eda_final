@@ -1,0 +1,8 @@
+.model example
+.inputs I0M I0L I1M I1L I2M I2L
+.outputs O0M O0L
+.names I0M I1M w1M
+.names I0L I1L w1L
+.names w1M I2M O0M
+.names w1L I2L O0L
+.end
