@@ -7,10 +7,10 @@ LIBFLAGS=../abc-master/libabc.a -lm -ldl -lreadline -lpthread
 all : bin/xec
 
 bin/xec : main.o
-	$(CC) $(DBGFLAGS) $(OPTFLAGS) -o $@ $< $(LIBFLAGS)
+	$(CC) -g -o $@ $< $(LIBFLAGS)
 
-main.o : src/main.cpp src/gate.h
-	$(CC) -Wall $(DBGFLAGS) $(CFLAGS) $< -o $@
+main.o : src/main.c src/gate.h
+	gcc -Wall $(DBGFLAGS) $(CFLAGS) $< -o $@
 
 clean:
 	rm -rf *.o bin/*
