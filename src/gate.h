@@ -31,7 +31,7 @@ typedef enum gate_type{
     MUX
 }GATE;
 
-static std::unordered_map<std::string, GATE> const gate_table = {{"and", GATE::AND}, {"or", GATE::OR}, {"nand", GATE::NAND}, {"nor", GATE::NOR},{"not", GATE::NOT} {"buf", GATE::BUF}, {"xor", GATE::XOR}, {"xnor", GATE::XNOR}, {"_DC", GATE::DC}, {"_HMUX", GATE::MUX}};
+static std::unordered_map<std::string, GATE> const gate_table = {{"and", GATE::AND}, {"or", GATE::OR}, {"nand", GATE::NAND}, {"nor", GATE::NOR},{"not", GATE::NOT}, {"buf", GATE::BUF}, {"xor", GATE::XOR}, {"xnor", GATE::XNOR}, {"_DC", GATE::DC}, {"_HMUX", GATE::MUX}};
 GATE str2gate(std::string gate_str){
     auto it = gate_table.find(gate_str);
     if(it != gate_table.end()){ return it->second; }
