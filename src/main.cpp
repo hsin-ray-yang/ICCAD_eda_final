@@ -109,8 +109,8 @@ int main( int argc, char** argv )
     IOnames.push_back("input2");
     IOnames.push_back("input3");
     
-
-    gate_blif(false, NOR, IOnames, blif_out);
+    
+    gate_blif(false, str2gate("nor"), IOnames, blif_out);
 
     //////////////////////////////////////////////////////////////////////////
     // start the ABC framework

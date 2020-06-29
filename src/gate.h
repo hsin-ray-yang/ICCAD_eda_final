@@ -14,9 +14,11 @@
 #include <sstream>
 #include <vector>
 #include <string>
+#include <unordered_map>
 #include <assert.h>
 
 typedef enum gate_type{
+    NONE,
     AND,
     OR,
     NAND,
@@ -29,7 +31,12 @@ typedef enum gate_type{
     MUX
 }GATE;
 
-
+static std::unordered_map<std::string, GATE> const gate_table = {{"and", GATE::AND}, {"or", GATE::OR}, {"nand", GATE::NAND}, {"nor", GATE::NOR},{"not", GATE::NOT} {"buf", GATE::BUF}, {"xor", GATE::XOR}, {"xnor", GATE::XNOR}, {"_DC", GATE::DC}, {"_HMUX", GATE::MUX}};
+GATE str2gate(std::string gate_str){
+    auto it = gate_table.find(gate_str);
+    if(it != gate_table.end()){ return it->second; }
+    else{ cerr << "Error: Not acceptable gate_str!!" << endl; return GATE::NONE; }
+}
 
 void gate_blif(bool GR, GATE g, std::vector<std::string>& IOname, std::fstream& outFile)
 {
@@ -47,7 +54,7 @@ void gate_blif(bool GR, GATE g, std::vector<std::string>& IOname, std::fstream& 
     switch (g)
     {
     case BUF:
-        // BUF buf0 (o, i);
+        // buf buf0 (o, i);
         assert(n == 2);
         // MSB
         gate_outM << getIOstring(1, 'M') << ' ' << getIOstring(0, 'M') << "\n";
@@ -58,7 +65,7 @@ void gate_blif(bool GR, GATE g, std::vector<std::string>& IOname, std::fstream& 
         break;
     
     case NOT:
-        // NOT not0 (o, i);
+        // not not0 (o, i);
         assert(n == 2);
         // MSB
         gate_outM << getIOstring(1, 'L') << ' ' << getIOstring(0, 'M') << "\n";
@@ -69,7 +76,7 @@ void gate_blif(bool GR, GATE g, std::vector<std::string>& IOname, std::fstream& 
         break;
 
     case AND:
-        // AND and0 (o, i0, i1, i2)
+        // and and0 (o, i0, i1, i2)
         for(int i = 1; i < n; i++){
             gate_outM << getIOstring(i, 'M') << ' ';
             gate_outL << getIOstring(i, 'L') << ' ';
@@ -85,7 +92,7 @@ void gate_blif(bool GR, GATE g, std::vector<std::string>& IOname, std::fstream& 
         break;
 
     case OR:
-        // OR or0 (o, i0, i1, i2)
+        // or or0 (o, i0, i1, i2)
         for(int i = 1; i < n; i++){
             gate_outM << getIOstring(i, 'M') << ' ';
             gate_outL << getIOstring(i, 'L') << ' ';
@@ -101,7 +108,7 @@ void gate_blif(bool GR, GATE g, std::vector<std::string>& IOname, std::fstream& 
         break;
 
     case NAND:
-        // NAND nand0 (o, i0, i1, i2)
+        // nand nand0 (o, i0, i1, i2)
         for(int i = 1; i < n; i++){
             gate_outM << getIOstring(i, 'L') << ' ';
             gate_outL << getIOstring(i, 'M') << ' ';
@@ -117,7 +124,7 @@ void gate_blif(bool GR, GATE g, std::vector<std::string>& IOname, std::fstream& 
         break;
 
     case NOR:
-        // NAND nand0 (o, i0, i1, i2)
+        // nor nor0 (o, i0, i1, i2)
         for(int i = 1; i < n; i++){
             gate_outM << getIOstring(i, 'L') << ' ';
             gate_outL << getIOstring(i, 'M') << ' ';
@@ -131,6 +138,16 @@ void gate_blif(bool GR, GATE g, std::vector<std::string>& IOname, std::fstream& 
         gate_outM << " 1" << '\n';
         gate_outL << " 1" << '\n';
         break;
+
+    case XOR:
+        // xor xor0 (o, i0, i1, i2)
+        // TODO
+        break;
+
+    case XNOR:
+        // xnor xnor0 (o, i0, i1, i2)
+        // TODO
+        break;
     
     case DC:
         // _DC dc0 (o, c, d)
@@ -142,8 +159,14 @@ void gate_blif(bool GR, GATE g, std::vector<std::string>& IOname, std::fstream& 
         gate_outL << getIOstring(1, 'L') << ' ' << getIOstring(2, 'L') << getIOstring(0, 'L') << '\n';
         gate_outL << "1- 1" << '\n' << "-1 1" << '\n';
         break;
+    
+    case MUX:
+        // _HMUX mux0 (o, i0, i1, s)
+        // TODO
+        break;
 
     default:
+        cerr << "Error: Not acceptable gate_type!!" << endl;
         break;
     }
 
