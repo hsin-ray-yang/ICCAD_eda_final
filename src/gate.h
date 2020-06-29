@@ -35,7 +35,7 @@ static std::unordered_map<std::string, GATE> const gate_table = {{"and", GATE::A
 GATE str2gate(std::string gate_str){
     auto it = gate_table.find(gate_str);
     if(it != gate_table.end()){ return it->second; }
-    else{ cerr << "Error: Not acceptable gate_str!!" << endl; return GATE::NONE; }
+    else{ std::cerr << "Error: Not acceptable gate_str!!" << std::endl; return GATE::NONE; }
 }
 
 void gate_blif(bool GR, GATE g, std::vector<std::string>& IOname, std::fstream& outFile)
@@ -166,7 +166,7 @@ void gate_blif(bool GR, GATE g, std::vector<std::string>& IOname, std::fstream& 
         break;
 
     default:
-        cerr << "Error: Not acceptable gate_type!!" << endl;
+        std::cerr << "Error: Not acceptable gate_type!!" << std::endl;
         break;
     }
 
