@@ -104,10 +104,13 @@ int main( int argc, char** argv )
     input_rf.open(argv[1], ios::in);
     blif_out.open(argv[2], ios::out);
 
-    IOnames.push_back("input");
     IOnames.push_back("output");
+    IOnames.push_back("input1");
+    IOnames.push_back("input2");
+    IOnames.push_back("input3");
+    
 
-    gate_blif(NOT, IOnames, blif_out);
+    gate_blif(false, NOR, IOnames, blif_out);
 
     //////////////////////////////////////////////////////////////////////////
     // start the ABC framework
