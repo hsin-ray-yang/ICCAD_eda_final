@@ -4,7 +4,7 @@
   
    Synopsis     [functions for verilog to blif for gates]
   
-   Author       [Joshua Lin]
+   Author       [Joshua Lin, modify by Ray Yang]
   
    Date         [Started - June 28, 2020.]
   
