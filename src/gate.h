@@ -11,6 +11,7 @@
 ***********************************************************************/
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include <assert.h>
 
 typedef enum gate_type{
@@ -264,20 +265,25 @@ int del_sp(char* str) {
     return ret+1;
 }
 
-//***************************************************************************
-// void print_detail(FILE * gf_blif, char * ptr, Header header,Gate gate)
-//***************************************************************************
+//************************************************************************************************
+// int print_detail(int GR, FILE * gr_blif, char * ptr, Header header,Gate gate,char *** outputs)
+//************************************************************************************************
 // Input :
-//      gf_blif : destination to print on.
+//      GR      : golden(1) or revise(0), revise(0) doesn't print INPUT/OUTPUT
+//      gr_blif : destination to print on.
 //      ptr     : origin string of verilog file.
 //      header  : type of header.
 //      gate    : type of gate.(if header is not GATE, then gate is useless)
+//      outputs : pointer of 2d char array.(if header is not OUTPUT, then gate is useless)
+//
+// Return :
+//      para_num : number of parameter of a entry.
 //      
-// print formal .blif style string on FILE* gf_blif
-/////////////////////////////////////////////////////////////////////////////
-void print_detail(FILE * gf_blif, char * ptr, Header header,Gate gate) {
+// print formal .blif style string on FILE* gr_blif
+//////////////////////////////////////////////////////////////////////////////////////////////////
+int print_detail(int GR, FILE * gr_blif, char * ptr, Header header,Gate gate,char *** outputs) {
     // clear space and count number of parameters
-    size_t para_num;
+    size_t para_num = 0;
     ptr = strtok(ptr, ";");
     para_num =del_sp(ptr);
 
@@ -286,7 +292,8 @@ void print_detail(FILE * gf_blif, char * ptr, Header header,Gate gate) {
 
     if ( header==GATE ) {
         ptr = strtok(ptr, ")");
-        char *name = strtok (ptr, "(");
+        // char *name = strtok (ptr, "(");
+        strtok (ptr, "(");
         char *entry[para_num];
         char *p = strtok (NULL, ",");
         int i = 0;
@@ -295,25 +302,154 @@ void print_detail(FILE * gf_blif, char * ptr, Header header,Gate gate) {
             entry[i++] = p;
             p = strtok (NULL, ",");
         }
-        gate_blif(1, gate, entry, para_num, gf_blif);
+        gate_blif(GR, gate, entry, para_num, gr_blif);
     }
-    else if ( header==INPUT || header==OUTPUT ){
-        char *entry[para_num];
+    else if ( ( header==OUTPUT || header==INPUT) && GR==1 ) {
+        char **entry = (char **)malloc(para_num * sizeof(char *));
         char *p = strtok (ptr, ",");
         int i = 0;
         while (p != NULL) {
-            entry[i++] = p;
+            (entry)[i] = (char *)malloc((strlen(p)+1) * sizeof(char));
+            strcpy((entry)[i] , p);
             p = strtok (NULL, ",");
+            ++i;
         }
 
-        fprintf(gf_blif, "%s ", header_name[header]);
+        fprintf(gr_blif, "%s ", header_name[header]);
         for (int i=0;i<para_num-1;++i) {
-            fprintf(gf_blif, "%s ", entry[i]);
+            fprintf(gr_blif, "%s ", (entry)[i]);
         }
-        fprintf(gf_blif, "%s\n", entry[para_num-1]);
+        fprintf(gr_blif, "%s\n", (entry)[para_num-1]);
+        *outputs = entry;
     }
-    else if ( header==END ){
-        fprintf(gf_blif, "%s\n", header_name[header]);
+    else if ( header==END && GR==0 ){
+        fprintf(gr_blif, "%s\n", header_name[header]);
     }
+    return para_num;
+}
+
+void write_blif(int GR, FILE * gr_blif, FILE * gr_v, char *** inputs , size_t * input_size, char *** outputs , size_t * output_size) {
+    // read gr file
+    char * line = NULL;
+    char * ptr = NULL;
+    size_t len = 0;
+    ssize_t read;
+
+    while ((read = getdelim(&line, &len,';', gr_v)) != -1) {
+        ptr = line;
+        Header header = DEFAULT_HEADER;
+        Gate gate = DEFAULT_GATE;
+        while (1) {
+            if (strncmp(ptr, "\x09", 1) == 0 ) {    // delete "tab"
+                // printf("%p\n", ptr);
+                ptr += 1;
+                continue;
+            }
+            if (strncmp(ptr, " ", 1) == 0 ) {       // delete " "
+                // printf("%p\n", ptr);
+                ptr += 1;
+                continue;
+            }
+            if (strncmp(ptr, "\n", 1) == 0 ) {      // delete "\n"
+                // printf("%p\n", ptr);
+                ptr += 1;
+                continue;
+            }
+            if (strncmp(ptr, "//", 2) == 0) {   // delete "//"
+                strtok_r(ptr, "\n",&ptr);
+                continue;
+            } 
+            if (strncmp(ptr, "/*", 2) == 0) {   // delete "/* */"
+                strtok_r(ptr, "*/",&ptr);
+                continue;
+            }
+            break;
+        }
+        if (strncmp(ptr, "module", 6) ==0) {
+            // header = MODULE;
+            // ptr += 11;
+            // ptr = strtok(ptr, ")");
+            continue;
+        }
+        else if (strncmp(ptr, "input", 5) ==0) {
+            header = INPUT;
+            ptr += 6;
+        }
+        else if (strncmp(ptr, "output", 6) ==0) {
+            header = OUTPUT;
+            ptr += 7;
+        }
+        else if (strncmp(ptr, "wire", 4) ==0) {
+            header = WIRE;
+            ptr += 5;
+        }
+        else if (strncmp(ptr, "endmodule", 4) ==0) {
+            header = END;
+        }
+        else {      // gate
+            header = GATE;
+            if (strncmp(ptr, "and", 3) ==0) {
+                gate = AND;
+                ptr += 4;
+            }
+            else if (strncmp(ptr, "or", 2) ==0) {
+                gate = OR;
+                ptr += 3;
+            }
+            else if (strncmp(ptr, "nand", 4) ==0) {
+                gate = NAND;
+                ptr += 5;
+            }
+            else if (strncmp(ptr, "nor", 3) ==0) {
+                gate = NOR;
+                ptr += 4;
+            }
+            else if (strncmp(ptr, "not", 3) ==0) {
+                gate = NOT;
+                ptr += 4;
+            }
+            else if (strncmp(ptr, "buf", 3) ==0) {
+                gate = BUF;
+                ptr += 4;
+            }
+            else if (strncmp(ptr, "xor", 3) ==0) {
+                gate = XOR;
+                ptr += 4;
+            }
+            else if (strncmp(ptr, "xnor", 4) ==0) {
+                gate = XNOR;
+                ptr += 5;
+            }
+            else if (strncmp(ptr, "_DC", 3) ==0) {
+                gate = DC;
+                ptr += 4;
+            }
+            else if (strncmp(ptr, "_HMUX", 5) ==0) {
+                gate = MUX;
+                ptr += 6;
+            }
+            else {
+                printf("ERRRRRRROR : read an unknown gate, \"%s\"",ptr);
+            }
+            
+        }
+
+        if (header == OUTPUT) {
+            *output_size = print_detail(GR,gr_blif,ptr,header,gate,outputs);
+        }
+        else if (header == INPUT) {
+            *input_size = print_detail(GR,gr_blif,ptr,header,gate,inputs);
+        }
+        else {
+            print_detail(GR,gr_blif,ptr,header,gate,NULL);
+        }  
+        
+    }
+
+    // for(int i=0;i< output_size;++i){
+    //     printf("%s ",(outputs)[i]);
+    // }
+    // printf("\n");
     return;
+
 }

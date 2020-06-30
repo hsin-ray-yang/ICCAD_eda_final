@@ -12,6 +12,7 @@
 #include "gate.h"
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -72,6 +73,15 @@ int main( int argc, char** argv )
     char * filename_rf;
     char * filename_out;
 
+    char ** output_gf;
+    char ** output_rf;
+    char ** input_gf;
+    char ** input_rf;
+    size_t output_gf_size;
+    size_t output_rf_size;
+    size_t input_gf_size;
+    size_t input_rf_size;
+
     //////////////////////////////////////////////////////////////////////////
     // get the input file names
     if ( argc != 4 )
@@ -85,135 +95,71 @@ int main( int argc, char** argv )
     filename_out = argv[3];
 
     //////////////////////////////////////////////////////////////////////////
-    // open gf file
+    // open gf rf file
     FILE * gf = fopen(filename_gf,"r");
+
     if (gf == NULL){
-        printf( "Error: read \"%s\" file got error\n",filename_gf);
+        printf( "Error: read \"%s\" golden file got error\n",filename_gf);
+        return 1;
+    }
+
+    FILE * rf = fopen(filename_rf,"r");
+
+    if (rf == NULL){
+        printf( "Error: read \"%s\" revise file got error\n",filename_rf);
         return 1;
     }
 
     //////////////////////////////////////////////////////////////////////////
-    // read gf file and write gf.blif
+    // read gf & rf file and write gf_rf.blif
+    char *last_rf = strrchr(filename_rf, '/');
+    size_t last_rf_size = (int)strlen(last_rf+1)-2;
 
-    int gf_len = strlen(filename_gf) + 3 + 1; // .v -> .blif
-    char filename_gf_blif[ gf_len ];
+    int gr_len = strlen(filename_gf) + 1 + last_rf_size + 3 + 1; // gf.v -> gf_rf.blif
+    char filename_gr_blif[ gr_len ];
 
-    memset(filename_gf_blif, '\0', gf_len);
-    strncat(filename_gf_blif,filename_gf,gf_len-5);
-    strcat(filename_gf_blif,"blif");
-    FILE * gf_blif = fopen(filename_gf_blif,"w");
-    // // printf("after concate : %s\nlength = %d\n", filename_gf_blif,strlen(filename_gf));
-    fprintf(gf_blif,"# .blif file of \"%.*s\" written by xec file.\n", gf_len-4, filename_gf );
+    memset(filename_gr_blif, '\0', gr_len);
 
-    char *last = strrchr(filename_gf_blif, '/');
-    fprintf(gf_blif,".model %.*s\n", (int)strlen(last+1)-5,last+1 );
-    char * line = NULL;
-    char * ptr = NULL;
-    size_t len = 0;
-    ssize_t read;
-    ssize_t ret;
+    strncat(filename_gr_blif,filename_gf,gr_len-7-last_rf_size);
+    strcat(filename_gr_blif,"_");
+    strncat(filename_gr_blif,last_rf+1,last_rf_size);
+    strcat(filename_gr_blif,".blif");
 
-    while ((read = getdelim(&line, &len,';', gf)) != -1) {
-        ptr = line;
-        Header header = DEFAULT_HEADER;
-        Gate gate = DEFAULT_GATE;
-        while (1) {
-            if (strncmp(ptr, "\x09", 1) == 0 ) {    // delete "tab"
-                // printf("%p\n", ptr);
-                ptr += 1;
-                continue;
-            }
-            if (strncmp(ptr, " ", 1) == 0 ) {       // delete " "
-                // printf("%p\n", ptr);
-                ptr += 1;
-                continue;
-            }
-            if (strncmp(ptr, "\n", 1) == 0 ) {      // delete "\n"
-                // printf("%p\n", ptr);
-                ptr += 1;
-                continue;
-            }
-            if (strncmp(ptr, "//", 2) == 0) {   // delete "//"
-                strtok_r(ptr, "\n",&ptr);
-                continue;
-            } 
-            if (strncmp(ptr, "/*", 2) == 0) {   // delete "/* */"
-                strtok_r(ptr, "*/",&ptr);
-                continue;
-            }
-            break;
-        }
-        if (strncmp(ptr, "module", 6) ==0) {
-            // header = MODULE;
-            // ptr += 11;
-            // ptr = strtok(ptr, ")");
-            continue;
-        }
-        else if (strncmp(ptr, "input", 5) ==0) {
-            header = INPUT;
-            ptr += 6;
-        }
-        else if (strncmp(ptr, "output", 6) ==0) {
-            header = OUTPUT;
-            ptr += 7;
-        }
-        else if (strncmp(ptr, "wire", 4) ==0) {
-            header = WIRE;
-            ptr += 5;
-        }
-        else if (strncmp(ptr, "endmodule", 4) ==0) {
-            header = END;
-        }
-        else {      // gate
-            header = GATE;
-            if (strncmp(ptr, "and", 3) ==0) {
-                gate = AND;
-                ptr += 4;
-            }
-            else if (strncmp(ptr, "or", 2) ==0) {
-                gate = OR;
-                ptr += 3;
-            }
-            else if (strncmp(ptr, "nand", 4) ==0) {
-                gate = NAND;
-                ptr += 5;
-            }
-            else if (strncmp(ptr, "nor", 3) ==0) {
-                gate = NOR;
-                ptr += 4;
-            }
-            else if (strncmp(ptr, "not", 3) ==0) {
-                gate = NOT;
-                ptr += 4;
-            }
-            else if (strncmp(ptr, "buf", 3) ==0) {
-                gate = BUF;
-                ptr += 4;
-            }
-            else if (strncmp(ptr, "xor", 3) ==0) {
-                gate = XOR;
-                ptr += 4;
-            }
-            else if (strncmp(ptr, "xnor", 4) ==0) {
-                gate = XNOR;
-                ptr += 5;
-            }
-            else if (strncmp(ptr, "_DC", 3) ==0) {
-                gate = DC;
-                ptr += 4;
-            }
-            else if (strncmp(ptr, "_HMUX", 5) ==0) {
-                gate = MUX;
-                ptr += 6;
-            }
-            else {
-                printf("ERRRRRRROR : read an unknown gate, \"%s\"",ptr);
-            }
-            
-        }
-        print_detail(gf_blif,ptr,header,gate);
-        
+    FILE * gr_blif = fopen(filename_gr_blif,"w");
+
+    fprintf(gr_blif,"# .blif file of \"%s\" and \"%s\" written by xec file.\n", filename_gf, filename_rf );
+
+    // write first line
+    char *last = strrchr(filename_gr_blif, '/');
+    fprintf(gr_blif,".model %.*s\n", (int)strlen(last+1)-5,last+1 );
+
+    write_blif(1,gr_blif,gf,&input_gf, &input_gf_size, &output_gf, &output_gf_size);
+    fclose(gf);
+    write_blif(0,gr_blif,rf,&input_rf, &input_rf_size, &output_rf, &output_rf_size);
+    fclose(rf);
+
+    
+
+    // for(int i=0;i< output_gf_size;++i){
+    //     printf("%s ",(output_gf)[i]);
+    // }
+    // printf("\n");
+
+    // for(int i=0;i< input_gf_size;++i){
+    //     printf("%s ",(input_gf)[i]);
+    // }
+    // printf("\n");
+
+    for(int i=0;i< output_rf_size;++i){
+        printf("%s ",(output_rf)[i]);
     }
+    printf("\n");
+
+    for(int i=0;i< input_rf_size;++i){
+        printf("%s ",(input_rf)[i]);
+    }
+    printf("\n");
+
 
     //////////////////////////////////////////////////////////////////////////
     // start the ABC framework
@@ -227,7 +173,6 @@ int main( int argc, char** argv )
     Abc_Stop();
 
     // free FILE pointer
-    fclose(gf);
-    fclose(gf_blif);
+    fclose(gr_blif);
     return 0;
 }
