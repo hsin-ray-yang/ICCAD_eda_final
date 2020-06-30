@@ -370,7 +370,7 @@ int del_sp(char* str) {
         if (*q == ',') {
             ++ret;
         }
-        if ((*q != '\x09')&&(*q != '\n')&&(*q != ' ')) {
+        if ((*q != '\x09')&&(*q != '\n')&&(*q != ' ')&&(*q != '\r')) {
             *p++ = *q;
         }
         q++;
@@ -465,6 +465,11 @@ void write_blif(int GR, FILE * gr_blif, FILE * gr_v, char *** inputs , size_t * 
                 ptr += 1;
                 continue;
             }
+            if (strncmp(ptr, "\r", 1) == 0 ) {      // delete "\r"
+                // printf("%p\n", ptr);
+                ptr += 1;
+                continue;
+            }
             if (strncmp(ptr, "\n", 1) == 0 ) {      // delete "\n"
                 // printf("%p\n", ptr);
                 ptr += 1;
@@ -480,6 +485,7 @@ void write_blif(int GR, FILE * gr_blif, FILE * gr_v, char *** inputs , size_t * 
             }
             break;
         }
+        printf("%d,%d",*ptr,*(ptr+1));
         if (strncmp(ptr, "module", 6) ==0) {
             // header = MODULE;
             // ptr += 11;
