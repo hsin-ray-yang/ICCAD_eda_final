@@ -43,7 +43,7 @@ void gate_blif(int GR, Gate g, char** IOname, int n, FILE * outFile)
     // gate g0 (i0, i1, i2, out);
     #define writeIOstring(i, ml) fprintf(outFile, "%s%s_%s", IOname[i], ml, GR_str)
 
-    char GR_str[] = GR ? "gf" : "rf";
+    char* GR_str = GR ? "gf" : "rf";
 
     switch (g)
     {
@@ -52,120 +52,188 @@ void gate_blif(int GR, Gate g, char** IOname, int n, FILE * outFile)
         assert(n == 2);
         // MSB
         fprintf(outFile, ".names ");
-        writeIOstring(1, 'M');
-        fprintf(outFile, ' ');
-        writeIOstring(0, 'M');
-        fprintf(outFile, '\n');
+        writeIOstring(1, "M");
+        fprintf(outFile, " ");
+        writeIOstring(0, "M");
+        fprintf(outFile, "\n");
         fprintf(outFile, "1 1\n");
         // LSB
         fprintf(outFile, ".names ");
-        writeIOstring(1, 'L');
-        fprintf(outFile, ' ');
-        writeIOstring(0, 'L');
-        fprintf(outFile, '\n');
+        writeIOstring(1, "L");
+        fprintf(outFile, " ");
+        writeIOstring(0, "L");
+        fprintf(outFile, "\n");
         fprintf(outFile, "1 1\n");
         break;
     
-    // case NOT:
-    //     // not not0 (o, i);
-    //     assert(n == 2);
-    //     // MSB
-    //     gate_outM << getIOstring(1, 'L') << ' ' << getIOstring(0, 'M') << "\n";
-    //     gate_outM << "0 1" << '\n';
-    //     // LSB
-    //     gate_outL << getIOstring(1, 'M') << ' ' << getIOstring(0, 'L') << "\n";
-    //     gate_outL << "0 1" << '\n';
-    //     break;
+    case NOT:
+        // not not0 (o, i);
+        assert(n == 2);
+        // MSB
+        fprintf(outFile, ".names ");
+        writeIOstring(1, "L");
+        fprintf(outFile, " ");
+        writeIOstring(0, "M");
+        fprintf(outFile, "\n");
+        fprintf(outFile, "0 1\n");
+        // LSB
+        fprintf(outFile, ".names ");
+        writeIOstring(1, "M");
+        fprintf(outFile, " ");
+        writeIOstring(0, "L");
+        fprintf(outFile, "\n");
+        fprintf(outFile, "0 1\n");
+        break;
 
-    // case AND:
-    //     // and and0 (o, i0, i1, i2)
-    //     for(int i = 1; i < n; i++){
-    //         gate_outM << getIOstring(i, 'M') << ' ';
-    //         gate_outL << getIOstring(i, 'L') << ' ';
-    //     }
-    //     gate_outM << getIOstring(0, 'M') << "\n";
-    //     gate_outL << getIOstring(0, 'L') << "\n";
-    //     for(int i = 1; i < n; i++){
-    //         gate_outM << '1';
-    //         gate_outL << '1';
-    //     }
-    //     gate_outM << " 1" << '\n';
-    //     gate_outL << " 1" << '\n';
-    //     break;
+    case AND:
+        // and and0 (o, i0, i1, i2)
+        // MSB
+        fprintf(outFile, ".names ");
+        for(int i = 1; i < n; i++){
+            writeIOstring(i, "M");
+            fprintf(outFile, " ");
+        }
+        writeIOstring(0, "M");
+        fprintf(outFile, "\n");
+        for(int i = 1; i < n; i++){
+            fprintf(outFile, "1");
+        }
+        fprintf(outFile, " 1\n");
+        // LSB
+        fprintf(outFile, ".names ");
+        for(int i = 1; i < n; i++){
+            writeIOstring(i, "L");
+            fprintf(outFile, " ");
+        }
+        writeIOstring(0, "L");
+        fprintf(outFile, "\n");
+        for(int i = 1; i < n; i++){
+            fprintf(outFile, "1");
+        }
+        fprintf(outFile, " 1\n");
+        break;
 
-    // case OR:
-    //     // or or0 (o, i0, i1, i2)
-    //     for(int i = 1; i < n; i++){
-    //         gate_outM << getIOstring(i, 'M') << ' ';
-    //         gate_outL << getIOstring(i, 'L') << ' ';
-    //     }
-    //     gate_outM << getIOstring(0, 'M') << "\n";
-    //     gate_outL << getIOstring(0, 'L') << "\n";
-    //     for(int i = 1; i < n; i++){
-    //         gate_outM << '0';
-    //         gate_outL << '0';
-    //     }
-    //     gate_outM << " 0" << '\n';
-    //     gate_outL << " 0" << '\n';
-    //     break;
+    case OR:
+        // or or0 (o, i0, i1, i2)
+        // MSB
+        fprintf(outFile, ".names ");
+        for(int i = 1; i < n; i++){
+            writeIOstring(i, "M");
+            fprintf(outFile, " ");
+        }
+        writeIOstring(0, "M");
+        fprintf(outFile, "\n");
+        for(int i = 1; i < n; i++){
+            fprintf(outFile, "0");
+        }
+        fprintf(outFile, " 0\n");
+        // LSB
+        fprintf(outFile, ".names ");
+        for(int i = 1; i < n; i++){
+            writeIOstring(i, "L");
+            fprintf(outFile, " ");
+        }
+        writeIOstring(0, "L");
+        fprintf(outFile, "\n");
+        for(int i = 1; i < n; i++){
+            fprintf(outFile, "0");
+        }
+        fprintf(outFile, " 0\n");
+        break;
 
-    // case NAND:
-    //     // nand nand0 (o, i0, i1, i2)
-    //     for(int i = 1; i < n; i++){
-    //         gate_outM << getIOstring(i, 'L') << ' ';
-    //         gate_outL << getIOstring(i, 'M') << ' ';
-    //     }
-    //     gate_outM << getIOstring(0, 'M') << "\n";
-    //     gate_outL << getIOstring(0, 'L') << "\n";
-    //     for(int i = 1; i < n; i++){
-    //         gate_outM << '1';
-    //         gate_outL << '1';
-    //     }
-    //     gate_outM << " 0" << '\n';
-    //     gate_outL << " 0" << '\n';
-    //     break;
+    case NAND:
+        // nand nand0 (o, i0, i1, i2)
+        // MSB
+        fprintf(outFile, ".names ");
+        for(int i = 1; i < n; i++){
+            writeIOstring(i, "L");
+            fprintf(outFile, " ");
+        }
+        writeIOstring(0, "M");
+        fprintf(outFile, "\n");
+        for(int i = 1; i < n; i++){
+            fprintf(outFile, "1");
+        }
+        fprintf(outFile, " 0\n");
+        // LSB
+        fprintf(outFile, ".names ");
+        for(int i = 1; i < n; i++){
+            writeIOstring(i, "M");
+            fprintf(outFile, " ");
+        }
+        writeIOstring(0, "L");
+        fprintf(outFile, "\n");
+        for(int i = 1; i < n; i++){
+            fprintf(outFile, "1");
+        }
+        fprintf(outFile, " 0\n");
+        break;
 
-    // case NOR:
-    //     // nor nor0 (o, i0, i1, i2)
-    //     for(int i = 1; i < n; i++){
-    //         gate_outM << getIOstring(i, 'L') << ' ';
-    //         gate_outL << getIOstring(i, 'M') << ' ';
-    //     }
-    //     gate_outM << getIOstring(0, 'M') << "\n";
-    //     gate_outL << getIOstring(0, 'L') << "\n";
-    //     for(int i = 1; i < n; i++){
-    //         gate_outM << '0';
-    //         gate_outL << '0';
-    //     }
-    //     gate_outM << " 1" << '\n';
-    //     gate_outL << " 1" << '\n';
-    //     break;
+    case NOR:
+        // nor nor0 (o, i0, i1, i2)
+        // MSB
+        fprintf(outFile, ".names ");
+        for(int i = 1; i < n; i++){
+            writeIOstring(i, "L");
+            fprintf(outFile, " ");
+        }
+        writeIOstring(0, "M");
+        fprintf(outFile, "\n");
+        for(int i = 1; i < n; i++){
+            fprintf(outFile, "0");
+        }
+        fprintf(outFile, " 1\n");
+        // LSB
+        fprintf(outFile, ".names ");
+        for(int i = 1; i < n; i++){
+            writeIOstring(i, "M");
+            fprintf(outFile, " ");
+        }
+        writeIOstring(0, "L");
+        fprintf(outFile, "\n");
+        for(int i = 1; i < n; i++){
+            fprintf(outFile, "0");
+        }
+        fprintf(outFile, " 1\n");
+        break;
 
-    // case XOR:
-    //     // xor xor0 (o, i0, i1, i2)
-    //     // TODO
-    //     break;
+    case XOR:
+        // xor xor0 (o, i0, i1, i2)
+        // TODO
+        break;
 
-    // case XNOR:
-    //     // xnor xnor0 (o, i0, i1, i2)
-    //     // TODO
-    //     break;
+    case XNOR:
+        // xnor xnor0 (o, i0, i1, i2)
+        // TODO
+        break;
     
-    // case DC:
-    //     // _DC dc0 (o, c, d)
-    //     assert(n == 3);
-    //     // MSB
-    //     gate_outM << getIOstring(1, 'M') << ' ' << getIOstring(2, 'L') << getIOstring(0, 'M') << '\n';
-    //     gate_outM << "10 1" << '\n';
-    //     // LSB
-    //     gate_outL << getIOstring(1, 'L') << ' ' << getIOstring(2, 'L') << getIOstring(0, 'L') << '\n';
-    //     gate_outL << "1- 1" << '\n' << "-1 1" << '\n';
-    //     break;
+    case DC:
+        // _DC dc0 (o, c, d)
+        assert(n == 3);
+        // MSB
+        fprintf(outFile, ".names ");
+        writeIOstring(1, "M");
+        fprintf(outFile, " ");
+        writeIOstring(2, "L");
+        fprintf(outFile, " ");
+        writeIOstring(0, "M");
+        fprintf(outFile, "\n");
+        fprintf(outFile, "10 1\n");
+        // LSB
+        fprintf(outFile, ".names ");
+        writeIOstring(1, "L");
+        fprintf(outFile, " ");
+        writeIOstring(2, "L");
+        fprintf(outFile, " ");
+        writeIOstring(0, "L");
+        fprintf(outFile, "\n");
+        fprintf(outFile, "1- 1\n-1 1\n");
+        break;
     
-    // case MUX:
-    //     // _HMUX mux0 (o, i0, i1, s)
-    //     // TODO
-    //     break;
+    case MUX:
+        // _HMUX mux0 (o, i0, i1, s)
+        // TODO
+        break;
 
     default:
         printf("Error: Not acceptable gate_type!!\n");
@@ -227,11 +295,7 @@ void print_detail(FILE * gf_blif, char * ptr, Header header,Gate gate) {
             entry[i++] = p;
             p = strtok (NULL, ",");
         }
-        fprintf(gf_blif, ".names (%s ==> %s) ",gate_type_name[gate],name);
-        for (int i=0;i<para_num-1;++i){
-            fprintf(gf_blif, "%s ", entry[i]);
-        }
-        fprintf(gf_blif, "%s\n", entry[para_num-1]);
+        gate_blif(1, gate, entry, para_num, gf_blif);
     }
     else if ( header==INPUT || header==OUTPUT ){
         char *entry[para_num];

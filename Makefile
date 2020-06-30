@@ -1,6 +1,6 @@
 CC=g++
-CFLAGS=-std=c++11 -c
-OPTFLAGS=-std=c++11 -O3
+CFLAGS=-c
+OPTFLAGS=-O3
 DBGFLAGS=-g
 LIBFLAGS=../abc-master/libabc.a -lm -ldl -lreadline -lpthread
 

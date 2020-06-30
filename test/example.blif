@@ -1,8 +1,13 @@
+# .blif file of "test/example.v" written by xec file.
 .model example
-.inputs I0M I0L I1M I1L I2M I2L
-.outputs O0M O0L
-.names I0M I1M w1M
-.names I0L I1L w1L
-.names w1M I2M O0M
-.names w1L I2L O0L
+.inputs I0 I1 I2
+.outputs O0
+.names I0M_gf w1M_gf
+1 1
+.names I0L_gf w1L_gf
+1 1
+.names w1M_gf O0M_gf
+1 1
+.names w1L_gf O0L_gf
+1 1
 .end
