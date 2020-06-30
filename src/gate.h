@@ -9,7 +9,7 @@
    Date         [Started - June 28, 2020.]
   
 ***********************************************************************/
-
+#include <string.h>
 
 typedef enum gate_type{
     DEFAULT_GATE = 0,
@@ -34,3 +34,20 @@ typedef enum header_type{
     GATE,
     END
 }Header;
+
+int del_sp(char* str) {
+    char *p = str;
+    char *q = str;
+    int ret =0;
+    while(*q!='\0') {
+        if (*q == ',') {
+            ++ret;
+        }
+        if ((*q != '\x09')&&(*q != '\n')&&(*q != ' ')) {
+            *p++ = *q;
+        }
+        q++;
+    }
+    *p='\0';
+    return ret;
+}

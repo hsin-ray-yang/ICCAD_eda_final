@@ -113,8 +113,8 @@ int main( int argc, char** argv )
     char * ptr = NULL;
     size_t len = 0;
     ssize_t read;
-    
     ssize_t ret;
+    size_t para_num;
     
 
     while ((read = getdelim(&line, &len,';', gf)) != -1) {
@@ -142,29 +142,39 @@ int main( int argc, char** argv )
             header = MODULE;
             ptr += 11;
             ptr = strtok(ptr, ")");
-            fprintf(gf_blif,"MODULE :\n%s\n", ptr);
+            // fprintf(gf_blif,"MODULE :\n%s\n", ptr);
+            para_num =del_sp(ptr);
+            fprintf(gf_blif,"%d : %d\n%s\n", header, para_num, ptr);
         }
         else if (strncmp(ptr, "input", 5) ==0) {
             header = INPUT;
             ptr += 6;
             ptr = strtok(ptr, ";");
-            fprintf(gf_blif,"INPUT :\n%s\n", ptr);
+            // fprintf(gf_blif,"INPUT :\n%s\n", ptr);
+            para_num =del_sp(ptr);
+            fprintf(gf_blif,"%d : %d\n%s\n", header, para_num, ptr);
         }
         else if (strncmp(ptr, "output", 6) ==0) {
             header = OUTPUT;
             ptr += 7;
             ptr = strtok(ptr, ";");
-            fprintf(gf_blif,"OUTPUT :\n%s\n", ptr);
+            // fprintf(gf_blif,"OUTPUT :\n%s\n", ptr);
+            para_num =del_sp(ptr);
+            fprintf(gf_blif,"%d : %d\n%s\n", header, para_num, ptr);
         }
         else if (strncmp(ptr, "wire", 4) ==0) {
             header = WIRE;
             ptr += 5;
             ptr = strtok(ptr, ";");
-            fprintf(gf_blif,"WIRE :\n%s\n", ptr);
+            // fprintf(gf_blif,"WIRE :\n%s\n", ptr);
+            para_num =del_sp(ptr);
+            fprintf(gf_blif,"%d : %d\n%s\n", header, para_num, ptr);
         }
         else if (strncmp(ptr, "endmodule", 4) ==0) {
             header = END;
-            fprintf(gf_blif,".end\n");
+            // fprintf(gf_blif,".end\n");
+            para_num =del_sp(ptr);
+            fprintf(gf_blif,"%d : %d\n%s\n", header, para_num, ptr);
         }
         else {      // gate
             header = GATE;
@@ -173,62 +183,64 @@ int main( int argc, char** argv )
                 gate = AND;
                 ptr += 4;
                 ptr = strtok(ptr, ";");
-                fprintf(gf_blif,"AND :\n%s\n", ptr);
+                // fprintf(gf_blif,"AND :\n%s\n", ptr);
             }
             else if (strncmp(ptr, "or", 2) ==0) {
                 gate = OR;
                 ptr += 3;
                 ptr = strtok(ptr, ";");
-                fprintf(gf_blif,"OR :\n%s\n", ptr);
+                // fprintf(gf_blif,"OR :\n%s\n", ptr);
             }
             else if (strncmp(ptr, "nand", 4) ==0) {
                 gate = NAND;
                 ptr += 5;
                 ptr = strtok(ptr, ";");
-                fprintf(gf_blif,"NAND :\n%s\n", ptr);
+                // fprintf(gf_blif,"NAND :\n%s\n", ptr);
             }
             else if (strncmp(ptr, "nor", 3) ==0) {
                 gate = NOR;
                 ptr += 4;
                 ptr = strtok(ptr, ";");
-                fprintf(gf_blif,"NOR :\n%s\n", ptr);
+                // fprintf(gf_blif,"NOR :\n%s\n", ptr);
             }
             else if (strncmp(ptr, "not", 3) ==0) {
                 gate = NOT;
                 ptr += 4;
                 ptr = strtok(ptr, ";");
-                fprintf(gf_blif,"NOT :\n%s\n", ptr);
+                // fprintf(gf_blif,"NOT :\n%s\n", ptr);
             }
             else if (strncmp(ptr, "buf", 3) ==0) {
                 gate = BUF;
                 ptr += 4;
                 ptr = strtok(ptr, ";");
-                fprintf(gf_blif,"BUF :\n%s\n", ptr);
+                // fprintf(gf_blif,"BUF :\n%s\n", ptr);
             }
             else if (strncmp(ptr, "xor", 3) ==0) {
                 gate = XOR;
                 ptr += 4;
                 ptr = strtok(ptr, ";");
-                fprintf(gf_blif,"XOR :\n%s\n", ptr);
+                // fprintf(gf_blif,"XOR :\n%s\n", ptr);
             }
             else if (strncmp(ptr, "xnor", 4) ==0) {
                 gate = XNOR;
                 ptr += 5;
                 ptr = strtok(ptr, ";");
-                fprintf(gf_blif,"XNOR :\n%s\n", ptr);
+                // fprintf(gf_blif,"XNOR :\n%s\n", ptr);
             }
             else if (strncmp(ptr, "_DC", 3) ==0) {
                 gate = DC;
                 ptr += 4;
                 ptr = strtok(ptr, ";");
-                fprintf(gf_blif,"DC :\n%s\n", ptr);
+                // fprintf(gf_blif,"DC :\n%s\n", ptr);
             }
             else if (strncmp(ptr, "_HMUX", 5) ==0) {
                 gate = MUX;
                 ptr += 6;
                 ptr = strtok(ptr, ";");
-                fprintf(gf_blif,"MUX :\n%s\n", ptr);
+                // fprintf(gf_blif,"MUX :\n%s\n", ptr);
             }
+            para_num =del_sp(ptr);
+            fprintf(gf_blif,"%d-%d : %d\n%s\n", header, gate, para_num, ptr);
         }
         
     }
