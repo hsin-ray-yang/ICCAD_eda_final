@@ -43,7 +43,7 @@ void writeXORstr(int n, int ones, int onoff, char* head, FILE * outFile)
     // onoff = 1, onset; onoff = 0, offset.
     // printf("Calling F(%d, %d)\n", n, ones);
     if(ones == 0){
-        fprintf(outFile, head);
+        fprintf(outFile, "%s",head);
         for(int i = 0; i < n; i++){ fprintf(outFile, "-0"); }
         fprintf(outFile, " %d\n", onoff);
     }
