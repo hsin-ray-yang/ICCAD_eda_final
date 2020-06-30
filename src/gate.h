@@ -65,7 +65,7 @@ void gate_blif(int GR, Gate g, char** IOname, int n, FILE * outFile)
     #define writeIOstring(i, ml) fprintf(outFile, "%s%s_%s", IOname[i], ml, GR_str)
 
     char* GR_str = GR ? "gf" : "rf";
-    char XORhead[2*n];
+    char XORhead[] = "";
 
     switch (g)
     {
@@ -349,10 +349,10 @@ void miter_blif(char** outNames, int n, FILE * outFile)
 void input_blif(char** inNames, int n, FILE * outFile)
 {
     for(int i = 0; i < n; i++){
-        fprintf(outFile, ".names %s %sM_gf\n1 1\n", inNames[i]);
-        fprintf(outFile, ".names %s %sL_gf\n1 1\n", inNames[i]);
-        fprintf(outFile, ".names %s %sM_rf\n1 1\n", inNames[i]);
-        fprintf(outFile, ".names %s %sL_rf\n1 1\n", inNames[i]);
+        fprintf(outFile, ".names %1$s %1$sM_gf\n1 1\n", inNames[i]);
+        fprintf(outFile, ".names %1$s %1$sL_gf\n1 1\n", inNames[i]);
+        fprintf(outFile, ".names %1$s %1$sM_rf\n1 1\n", inNames[i]);
+        fprintf(outFile, ".names %1$s %1$sL_rf\n1 1\n", inNames[i]);
     }
 }
 
