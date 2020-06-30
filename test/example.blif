@@ -1,13 +1,41 @@
 # .blif file of "test/example.v" written by xec file.
 .model example
-.inputs I0 I1 I2
-.outputs O0
-.names I0M_gf w1M_gf
-1 1
-.names I0L_gf w1L_gf
-1 1
-.names w1M_gf O0M_gf
-1 1
-.names w1L_gf O0L_gf
-1 1
+.inputs I0 I1 I2 I3 I4
+.outputs O0 O1
+.names I0M_gf I0L_gf I1M_gf I1L_gf I2M_gf I2L_gf I3M_gf I3L_gf O0M_gf
+1--0-0-0 1
+-01--0-0 1
+-0-01--0 1
+-0-0-01- 1
+1-1-1--0 1
+1-1--01- 1
+1--01-1- 1
+-01-1-1- 1
+.names I0M_gf I0L_gf I1M_gf I1L_gf I2M_gf I2L_gf I3M_gf I3L_gf O0L_gf
+-0-0-0-0 0
+1-1--0-0 0
+1--01--0 0
+1--0-01- 0
+-01-1--0 0
+-01--01- 0
+-0-01-1- 0
+1-1-1-1- 0
+.names I0M_gf I0L_gf I1M_gf I1L_gf I2M_gf I2L_gf I3M_gf I3L_gf O1M_gf
+-0-0-0-0 1
+1-1--0-0 1
+1--01--0 1
+1--0-01- 1
+-01-1--0 1
+-01--01- 1
+-0-01-1- 1
+1-1-1-1- 1
+.names I0M_gf I0L_gf I1M_gf I1L_gf I2M_gf I2L_gf I3M_gf I3L_gf O1L_gf
+1--0-0-0 0
+-01--0-0 0
+-0-01--0 0
+-0-0-01- 0
+1-1-1--0 0
+1-1--01- 0
+1--01-1- 0
+-01-1-1- 0
 .end

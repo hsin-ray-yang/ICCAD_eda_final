@@ -37,6 +37,26 @@ typedef enum header_type{
     END
 }Header;
 
+void writeXORstr(int n, int ones, int onoff, char* head, FILE * outFile)
+{
+    // onoff = 1, onset; onoff = 0, offset.
+    printf("Calling F(%d, %d)\n", n, ones);
+    if(ones == 0){
+        fprintf(outFile, head);
+        for(int i = 0; i < n; i++){ fprintf(outFile, "-0"); }
+        fprintf(outFile, " %d\n", onoff);
+    }
+    else{
+        char new_head[2*n];
+        for(int i = 0; i <= n-ones; i++){
+            strcpy(new_head, head);
+            for(int j = 0; j < i; j++){ strcat(new_head, "-0"); }
+            strcat(new_head, "1-");
+            writeXORstr(n-i-1, ones-1, onoff, new_head, outFile);
+        }
+    }
+}
+
 void gate_blif(int GR, Gate g, char** IOname, int n, FILE * outFile)
 {
     /* GR = 0 if revised; GR = 1 if golden */
@@ -44,6 +64,7 @@ void gate_blif(int GR, Gate g, char** IOname, int n, FILE * outFile)
     #define writeIOstring(i, ml) fprintf(outFile, "%s%s_%s", IOname[i], ml, GR_str)
 
     char* GR_str = GR ? "gf" : "rf";
+    char XORhead[2*n];
 
     switch (g)
     {
@@ -199,12 +220,54 @@ void gate_blif(int GR, Gate g, char** IOname, int n, FILE * outFile)
 
     case XOR:
         // xor xor0 (o, i0, i1, i2)
-        // TODO
+        // MSB
+        fprintf(outFile, ".names ");
+        for(int i = 1; i < n; i++){
+            writeIOstring(i, "M");
+            fprintf(outFile, " ");
+            writeIOstring(i, "L");
+            fprintf(outFile, " ");
+        }
+        writeIOstring(0, "M");
+        fprintf(outFile, "\n");
+        for(int num_ones = 1; num_ones < n; num_ones += 2){ writeXORstr(n-1, num_ones, 1, XORhead, outFile); }
+        // LSB
+        fprintf(outFile, ".names ");
+        for(int i = 1; i < n; i++){
+            writeIOstring(i, "M");
+            fprintf(outFile, " ");
+            writeIOstring(i, "L");
+            fprintf(outFile, " ");
+        }
+        writeIOstring(0, "L");
+        fprintf(outFile, "\n");
+        for(int num_ones = 0; num_ones < n; num_ones += 2){ writeXORstr(n-1, num_ones, 0, XORhead, outFile); }
         break;
 
     case XNOR:
         // xnor xnor0 (o, i0, i1, i2)
-        // TODO
+        // MSB
+        fprintf(outFile, ".names ");
+        for(int i = 1; i < n; i++){
+            writeIOstring(i, "M");
+            fprintf(outFile, " ");
+            writeIOstring(i, "L");
+            fprintf(outFile, " ");
+        }
+        writeIOstring(0, "M");
+        fprintf(outFile, "\n");
+        for(int num_ones = 0; num_ones < n; num_ones += 2){ writeXORstr(n-1, num_ones, 1, XORhead, outFile); }
+        // LSB
+        fprintf(outFile, ".names ");
+        for(int i = 1; i < n; i++){
+            writeIOstring(i, "M");
+            fprintf(outFile, " ");
+            writeIOstring(i, "L");
+            fprintf(outFile, " ");
+        }
+        writeIOstring(0, "L");
+        fprintf(outFile, "\n");
+        for(int num_ones = 1; num_ones < n; num_ones += 2){ writeXORstr(n-1, num_ones, 0, XORhead, outFile); }
         break;
     
     case DC:
@@ -232,7 +295,33 @@ void gate_blif(int GR, Gate g, char** IOname, int n, FILE * outFile)
     
     case MUX:
         // _HMUX mux0 (o, i0, i1, s)
-        // TODO
+        assert(n == 4);
+        // MSB
+        fprintf(outFile, ".names ");
+        writeIOstring(1, "M");
+        fprintf(outFile, " ");
+        writeIOstring(2, "M");
+        fprintf(outFile, " ");
+        writeIOstring(3, "M");
+        fprintf(outFile, " ");
+        writeIOstring(3, "L");
+        fprintf(outFile, " ");
+        writeIOstring(0, "M");
+        fprintf(outFile, "\n");
+        fprintf(outFile, "1--0 1\n-11- 1\n11-- 1\n");
+        // LSB
+        fprintf(outFile, ".names ");
+        writeIOstring(1, "L");
+        fprintf(outFile, " ");
+        writeIOstring(2, "L");
+        fprintf(outFile, " ");
+        writeIOstring(3, "M");
+        fprintf(outFile, " ");
+        writeIOstring(3, "L");
+        fprintf(outFile, " ");
+        writeIOstring(0, "L");
+        fprintf(outFile, "\n");
+        fprintf(outFile, "1-0- 1\n-1-1 1\n");
         break;
 
     default:
