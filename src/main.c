@@ -118,17 +118,17 @@ int main( int argc, char** argv )
         Header header = DEFAULT_HEADER;
         Gate gate = DEFAULT_GATE;
         while (1) {
-            if (strncmp(ptr, "\x09", 1) == 0 ) {
+            if (strncmp(ptr, "\x09", 1) == 0 ) {    // delete "tab"
                 // printf("%p\n", ptr);
                 ptr += 1;
                 continue;
             }
-            if (strncmp(ptr, " ", 1) == 0 ) {
+            if (strncmp(ptr, " ", 1) == 0 ) {       // delete " "
                 // printf("%p\n", ptr);
                 ptr += 1;
                 continue;
             }
-            if (strncmp(ptr, "\n", 1) == 0 ) {
+            if (strncmp(ptr, "\n", 1) == 0 ) {      // delete "\n"
                 // printf("%p\n", ptr);
                 ptr += 1;
                 continue;
