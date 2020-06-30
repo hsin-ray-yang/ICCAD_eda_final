@@ -418,7 +418,7 @@ int print_detail(int GR, FILE * gr_blif, char * ptr, Header header,Gate gate,cha
         }
         gate_blif(GR, gate, entry, para_num, gr_blif);
     }
-    else if ( ( header==OUTPUT || header==INPUT) && GR==1 ) {
+    else if ( ( header==OUTPUT || header==INPUT) ) {
         char **entry = (char **)malloc(para_num * sizeof(char *));
         char *p = strtok (ptr, ",");
         int i = 0;
@@ -428,12 +428,13 @@ int print_detail(int GR, FILE * gr_blif, char * ptr, Header header,Gate gate,cha
             p = strtok (NULL, ",");
             ++i;
         }
-
-        fprintf(gr_blif, "%s ", header_name[header]);
-        for (int i=0;i<para_num-1;++i) {
-            fprintf(gr_blif, "%s ", (entry)[i]);
+        if ( GR==1 ) {
+            fprintf(gr_blif, "%s ", header_name[header]);
+            for (int i=0;i<para_num-1;++i) {
+                fprintf(gr_blif, "%s ", (entry)[i]);
+            }
+            fprintf(gr_blif, "%s\n", (entry)[para_num-1]);
         }
-        fprintf(gr_blif, "%s\n", (entry)[para_num-1]);
         *outputs = entry;
     }
     else if ( header==END && GR==0 ){

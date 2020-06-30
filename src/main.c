@@ -140,25 +140,31 @@ int main( int argc, char** argv )
 
     
 
-    // for(int i=0;i< output_gf_size;++i){
-    //     printf("%s ",(output_gf)[i]);
-    // }
-    // printf("\n");
-
-    // for(int i=0;i< input_gf_size;++i){
-    //     printf("%s ",(input_gf)[i]);
-    // }
-    // printf("\n");
-
-    for(int i=0;i< output_rf_size;++i){
-        printf("%s ",(output_rf)[i]);
+    printf("INPUT gf :\n");
+    for(int i=0;i< input_gf_size;++i){
+        printf("%s ",(input_gf)[i]);
     }
-    printf("\n");
+    printf("\n\n");
 
+    printf("OUTPUT gf :\n");
+    for(int i=0;i< output_gf_size;++i){
+        printf("%s ",(output_gf)[i]);
+    }
+    printf("\n\n");
+
+    printf("INPUT rf :\n");
     for(int i=0;i< input_rf_size;++i){
         printf("%s ",(input_rf)[i]);
     }
-    printf("\n");
+    printf("\n\n");
+
+    printf("OUTPUT rf :\n");
+    for(int i=0;i< output_rf_size;++i){
+        printf("%s ",(output_rf)[i]);
+    }
+    printf("\n\n");
+
+
 
 
     //////////////////////////////////////////////////////////////////////////
