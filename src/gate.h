@@ -36,6 +36,12 @@ typedef enum header_type{
     END
 }Header;
 
+//*************************************************************
+// int del_sp(char* str)
+//*************************************************************
+// delete all space, \n, tab in the string,
+// return numbers of sub-string saparated by ',' in the string.
+///////////////////////////////////////////////////////////////
 int del_sp(char* str) {
     char *p = str;
     char *q = str;
@@ -53,13 +59,24 @@ int del_sp(char* str) {
     return ret+1;
 }
 
+//***************************************************************************
+// void print_detail(FILE * gf_blif, char * ptr, Header header,Gate gate)
+//***************************************************************************
+// Input :
+//      gf_blif : destination to print on.
+//      ptr     : origin string of verilog file.
+//      header  : type of header.
+//      gate    : type of gate.(if header is not GATE, then gate is useless)
+//      
+// print formal .blif style string on FILE* gf_blif
+/////////////////////////////////////////////////////////////////////////////
 void print_detail(FILE * gf_blif, char * ptr, Header header,Gate gate) {
-    // clear space and count # parameters
+    // clear space and count number of parameters
     size_t para_num;
     ptr = strtok(ptr, ";");
     para_num =del_sp(ptr);
 
-    char * header_name[7] = {"no_use_d", "no_use_m",".inputs", ".outputs", "no_use_w", "no_use_g", ".end"};
+    char * header_name[7] = {"no_use_d", "no_use_m",".inputs", ".outputs", "no_use_w", ".names", ".end"};
     char * gate_type_name[11] = {"DEFAULT_GATE", "AND", "OR", "NAND", "NOR", "NOT", "BUF", "XOR", "XNOR", "DC", "MUX"};
 
     if ( header==GATE ) {
@@ -83,14 +100,13 @@ void print_detail(FILE * gf_blif, char * ptr, Header header,Gate gate) {
         char *entry[para_num];
         char *p = strtok (ptr, ",");
         int i = 0;
-        while (p != NULL)
-        {
+        while (p != NULL) {
             entry[i++] = p;
             p = strtok (NULL, ",");
         }
 
         fprintf(gf_blif, "%s ", header_name[header]);
-        for (int i=0;i<para_num-1;++i){
+        for (int i=0;i<para_num-1;++i) {
             fprintf(gf_blif, "%s ", entry[i]);
         }
         fprintf(gf_blif, "%s\n", entry[para_num-1]);
