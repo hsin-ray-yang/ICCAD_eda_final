@@ -4,16 +4,17 @@
   
    Synopsis     [functions for verilog to blif for gates]
   
-   Author       [Joshua Lin]
+   Author       [Joshua Lin, modify by Ray Yang]
   
    Date         [Started - June 28, 2020.]
   
 ***********************************************************************/
 #include <stdio.h>
+#include <string.h>
 #include <assert.h>
 
 typedef enum gate_type{
-    NONE,
+    DEFAULT_GATE = 0,
     AND,
     OR,
     NAND,
@@ -24,10 +25,19 @@ typedef enum gate_type{
     XNOR,
     DC,
     MUX
-}GATE;
+}Gate;
 
+typedef enum header_type{
+    DEFAULT_HEADER = 0,
+    MODULE,
+    INPUT,
+    OUTPUT,
+    WIRE,
+    GATE,
+    END
+}Header;
 
-void gate_blif(int GR, GATE g, char** IOname, int n, FILE * outFile)
+void gate_blif(int GR, Gate g, char** IOname, int n, FILE * outFile)
 {
     /* GR = 0 if revised; GR = 1 if golden */
     // gate g0 (i0, i1, i2, out);
@@ -163,3 +173,83 @@ void gate_blif(int GR, GATE g, char** IOname, int n, FILE * outFile)
     }
 }
 
+//*************************************************************
+// int del_sp(char* str)
+//*************************************************************
+// delete all space, \n, tab in the string,
+// return numbers of sub-string saparated by ',' in the string.
+///////////////////////////////////////////////////////////////
+int del_sp(char* str) {
+    char *p = str;
+    char *q = str;
+    int ret =0;
+    while(*q!='\0') {
+        if (*q == ',') {
+            ++ret;
+        }
+        if ((*q != '\x09')&&(*q != '\n')&&(*q != ' ')) {
+            *p++ = *q;
+        }
+        q++;
+    }
+    *p='\0';
+    return ret+1;
+}
+
+//***************************************************************************
+// void print_detail(FILE * gf_blif, char * ptr, Header header,Gate gate)
+//***************************************************************************
+// Input :
+//      gf_blif : destination to print on.
+//      ptr     : origin string of verilog file.
+//      header  : type of header.
+//      gate    : type of gate.(if header is not GATE, then gate is useless)
+//      
+// print formal .blif style string on FILE* gf_blif
+/////////////////////////////////////////////////////////////////////////////
+void print_detail(FILE * gf_blif, char * ptr, Header header,Gate gate) {
+    // clear space and count number of parameters
+    size_t para_num;
+    ptr = strtok(ptr, ";");
+    para_num =del_sp(ptr);
+
+    char * header_name[7] = {"no_use_d", "no_use_m",".inputs", ".outputs", "no_use_w", ".names", ".end"};
+    char * gate_type_name[11] = {"DEFAULT_GATE", "AND", "OR", "NAND", "NOR", "NOT", "BUF", "XOR", "XNOR", "DC", "MUX"};
+
+    if ( header==GATE ) {
+        ptr = strtok(ptr, ")");
+        char *name = strtok (ptr, "(");
+        char *entry[para_num];
+        char *p = strtok (NULL, ",");
+        int i = 0;
+        while (p != NULL)
+        {
+            entry[i++] = p;
+            p = strtok (NULL, ",");
+        }
+        fprintf(gf_blif, ".names (%s ==> %s) ",gate_type_name[gate],name);
+        for (int i=0;i<para_num-1;++i){
+            fprintf(gf_blif, "%s ", entry[i]);
+        }
+        fprintf(gf_blif, "%s\n", entry[para_num-1]);
+    }
+    else if ( header==INPUT || header==OUTPUT ){
+        char *entry[para_num];
+        char *p = strtok (ptr, ",");
+        int i = 0;
+        while (p != NULL) {
+            entry[i++] = p;
+            p = strtok (NULL, ",");
+        }
+
+        fprintf(gf_blif, "%s ", header_name[header]);
+        for (int i=0;i<para_num-1;++i) {
+            fprintf(gf_blif, "%s ", entry[i]);
+        }
+        fprintf(gf_blif, "%s\n", entry[para_num-1]);
+    }
+    else if ( header==END ){
+        fprintf(gf_blif, "%s\n", header_name[header]);
+    }
+    return;
+}
