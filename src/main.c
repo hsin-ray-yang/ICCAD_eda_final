@@ -71,7 +71,7 @@ int main( int argc, char** argv )
     Abc_Frame_t * pAbc;
     char * filename_gf;
     char * filename_rf;
-    char * filename_out;
+    // char * filename_out; // use afterward
 
     char ** output_gf;
     char ** output_rf;
@@ -92,7 +92,7 @@ int main( int argc, char** argv )
     }
     filename_gf = argv[1];
     filename_rf = argv[2];
-    filename_out = argv[3];
+    // filename_out = argv[3]; // use afterward
 
     //////////////////////////////////////////////////////////////////////////
     // open gf rf file
@@ -134,37 +134,37 @@ int main( int argc, char** argv )
     fprintf(gr_blif,".model %.*s\n", (int)strlen(last+1)-5,last+1 );
 
     write_blif(1,gr_blif,gf,&input_gf, &input_gf_size, &output_gf, &output_gf_size);
-    fclose(gf);
     write_blif(0,gr_blif,rf,&input_rf, &input_rf_size, &output_rf, &output_rf_size);
-    fclose(rf);
 
     // add input buffer
     input_blif(input_gf, input_gf_size, gr_blif);
     // add output miter
     miter_blif(output_gf, output_gf_size, gr_blif);
 
-    printf("INPUT gf :\n");
-    for(int i=0;i< input_gf_size;++i){
-        printf("%s ",(input_gf)[i]);
-    }
-    printf("\n\n");
+    
 
-    printf("OUTPUT gf :\n");
-    for(int i=0;i< output_gf_size;++i){
-        printf("%s ",(output_gf)[i]);
-    }
-    printf("\n\n");
+    // printf("INPUT gf :\n");
+    // for(int i=0;i< input_gf_size;++i){
+    //     printf("%s ",(input_gf)[i]);
+    // }
+    // printf("\n\n");
 
-    printf("INPUT rf :\n");
-    for(int i=0;i< input_rf_size;++i){
-        printf("%s ",(input_rf)[i]);
-    }
-    printf("\n\n");
+    // printf("OUTPUT gf :\n");
+    // for(int i=0;i< output_gf_size;++i){
+    //     printf("%s ",(output_gf)[i]);
+    // }
+    // printf("\n\n");
 
-    printf("OUTPUT rf :\n");
-    for(int i=0;i< output_rf_size;++i){
-        printf("%s ",(output_rf)[i]);
-    }
+    // printf("INPUT rf :\n");
+    // for(int i=0;i< input_rf_size;++i){
+    //     printf("%s ",(input_rf)[i]);
+    // }
+    // printf("\n\n");
+
+    // printf("OUTPUT rf :\n");
+    // for(int i=0;i< output_rf_size;++i){
+    //     printf("%s ",(output_rf)[i]);
+    // }
     printf("\n\n");
 
 
@@ -183,5 +183,25 @@ int main( int argc, char** argv )
 
     // free FILE pointer
     fclose(gr_blif);
+    fclose(gf);
+    fclose(rf);
+
+    // free molloc array
+    for(int i=0;i< input_gf_size;++i){
+        free(input_gf[i]);
+    }
+    free(input_gf);
+    for(int i=0;i< output_gf_size;++i){
+        free(output_gf[i]);
+    }
+    free(output_gf);
+    for(int i=0;i< input_rf_size;++i){
+        free(input_rf[i]);
+    }
+    free(input_rf);
+    for(int i=0;i< output_rf_size;++i){
+        free(output_rf[i]);
+    }
+    free(output_rf);
     return 0;
 }

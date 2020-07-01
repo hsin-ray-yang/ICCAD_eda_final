@@ -370,7 +370,7 @@ int del_sp(char* str) {
         if (*q == ',') {
             ++ret;
         }
-        if ((*q != '\x09')&&(*q != '\n')&&(*q != ' ')) {
+        if ((*q != '\x09')&&(*q != '\n')&&(*q != ' ')&&(*q != '\r')) {
             *p++ = *q;
         }
         q++;
@@ -391,7 +391,7 @@ int del_sp(char* str) {
 //      outputs : pointer of 2d char array.(if header is not OUTPUT, then gate is useless)
 //
 // Return :
-//      para_num : number of parameter of a entry.
+//      para_num : number of parameter of an entry.
 //      
 // print formal .blif style string on FILE* gr_blif
 //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -402,7 +402,7 @@ int print_detail(int GR, FILE * gr_blif, char * ptr, Header header,Gate gate,cha
     para_num =del_sp(ptr);
 
     char * header_name[7] = {"no_use_d", "no_use_m",".inputs", ".outputs", "no_use_w", ".names", ".end"};
-    char * gate_type_name[11] = {"DEFAULT_GATE", "AND", "OR", "NAND", "NOR", "NOT", "BUF", "XOR", "XNOR", "DC", "MUX"};
+    // char * gate_type_name[11] = {"DEFAULT_GATE", "AND", "OR", "NAND", "NOR", "NOT", "BUF", "XOR", "XNOR", "DC", "MUX"};
 
     if ( header==GATE ) {
         ptr = strtok(ptr, ")");
@@ -461,6 +461,11 @@ void write_blif(int GR, FILE * gr_blif, FILE * gr_v, char *** inputs , size_t * 
                 continue;
             }
             if (strncmp(ptr, " ", 1) == 0 ) {       // delete " "
+                // printf("%p\n", ptr);
+                ptr += 1;
+                continue;
+            }
+            if (strncmp(ptr, "\r", 1) == 0 ) {      // delete "\r"
                 // printf("%p\n", ptr);
                 ptr += 1;
                 continue;
