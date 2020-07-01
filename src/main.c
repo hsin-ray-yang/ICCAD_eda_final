@@ -140,6 +140,7 @@ int main( int argc, char** argv )
     input_blif(input_gf, input_gf_size, gr_blif);
     // add output miter
     miter_blif(output_gf, output_gf_size, gr_blif);
+    fprintf(gr_blif, ".end \n");
 
     
 

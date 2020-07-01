@@ -401,7 +401,7 @@ int print_detail(int GR, FILE * gr_blif, char * ptr, Header header,Gate gate,cha
     ptr = strtok(ptr, ";");
     para_num =del_sp(ptr);
 
-    char * header_name[7] = {"no_use_d", "no_use_m",".inputs", ".outputs", "no_use_w", ".names", ".end"};
+    // char * header_name[7] = {"no_use_d", "no_use_m",".inputs", ".outputs", "no_use_w", ".names", ".end"};
     // char * gate_type_name[11] = {"DEFAULT_GATE", "AND", "OR", "NAND", "NOR", "NOT", "BUF", "XOR", "XNOR", "DC", "MUX"};
 
     if ( header==GATE ) {
@@ -418,7 +418,7 @@ int print_detail(int GR, FILE * gr_blif, char * ptr, Header header,Gate gate,cha
         }
         gate_blif(GR, gate, entry, para_num, gr_blif);
     }
-    else if ( ( header==OUTPUT || header==INPUT) ) {
+    else if ( ( header==OUTPUT || header==INPUT ) ) {
         char **entry = (char **)malloc(para_num * sizeof(char *));
         char *p = strtok (ptr, ",");
         int i = 0;
@@ -429,16 +429,21 @@ int print_detail(int GR, FILE * gr_blif, char * ptr, Header header,Gate gate,cha
             ++i;
         }
         if ( GR==1 ) {
-            fprintf(gr_blif, "%s ", header_name[header]);
-            for (int i=0;i<para_num-1;++i) {
-                fprintf(gr_blif, "%s ", (entry)[i]);
+            if ( header==INPUT ) {
+                fprintf(gr_blif, ".inputs ");
+                for (int i=0;i<para_num-1;++i) {
+                    fprintf(gr_blif, "%s ", (entry)[i]);
+                }
+                fprintf(gr_blif, "%s\n", (entry)[para_num-1]);
             }
-            fprintf(gr_blif, "%s\n", (entry)[para_num-1]);
+            else {
+                fprintf(gr_blif, ".outputs IU\n");
+            }
         }
         *outputs = entry;
     }
     else if ( header==END && GR==0 ){
-        fprintf(gr_blif, "%s\n", header_name[header]);
+        // fprintf(gr_blif, "%s\n", header_name[header]);
     }
     return para_num;
 }
