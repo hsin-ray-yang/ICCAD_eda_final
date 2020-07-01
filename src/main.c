@@ -13,7 +13,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-
+#include <time.h>
 
 ////////////////////////////////////////////////////////////////////////
 ///                        DECLARATIONS                              ///
@@ -68,7 +68,6 @@ int main( int argc, char** argv )
 {
 
     // variables
-    Abc_Frame_t * pAbc;
     char * filename_gf;
     char * filename_rf;
     // char * filename_out; // use afterward
@@ -141,46 +140,7 @@ int main( int argc, char** argv )
     // add output miter
     miter_blif(output_gf, output_gf_size, gr_blif);
     fprintf(gr_blif, ".end \n");
-
-    
-
-    // printf("INPUT gf :\n");
-    // for(int i=0;i< input_gf_size;++i){
-    //     printf("%s ",(input_gf)[i]);
-    // }
-    // printf("\n\n");
-
-    // printf("OUTPUT gf :\n");
-    // for(int i=0;i< output_gf_size;++i){
-    //     printf("%s ",(output_gf)[i]);
-    // }
-    // printf("\n\n");
-
-    // printf("INPUT rf :\n");
-    // for(int i=0;i< input_rf_size;++i){
-    //     printf("%s ",(input_rf)[i]);
-    // }
-    // printf("\n\n");
-
-    // printf("OUTPUT rf :\n");
-    // for(int i=0;i< output_rf_size;++i){
-    //     printf("%s ",(output_rf)[i]);
-    // }
     printf("\n\n");
-
-
-
-
-    //////////////////////////////////////////////////////////////////////////
-    // start the ABC framework
-    Abc_Start();
-    pAbc = Abc_FrameGetGlobalFrame();
-
-    //Cmd_CommandExecute( pAbc, Command )
-
-
-    // stop the ABC framework
-    Abc_Stop();
 
     // free FILE pointer
     fclose(gr_blif);
@@ -204,5 +164,76 @@ int main( int argc, char** argv )
         free(output_rf[i]);
     }
     free(output_rf);
+
+
+    //////////////////////////////////////////////////////////////////////////
+    // variable of the ABC framework
+    Abc_Frame_t * pAbc;
+    char Command[1000];
+    // clock_t  clk, clkend;
+
+
+    //////////////////////////////////////////////////////////////////////////
+    // start the ABC framework
+    Abc_Start();
+    pAbc = Abc_FrameGetGlobalFrame();
+
+    // read the file
+    sprintf( Command, "read %s", filename_gr_blif );
+    printf(">> read %s\n", filename_gr_blif );
+    if ( Cmd_CommandExecute( pAbc, Command ) )
+    {
+        fprintf( stdout, "Cannot execute command \"%s\".\n", Command );
+        return 1;
+    }
+
+    // balance
+    sprintf( Command, "balance" );
+    printf(">> balance\n" );
+    if ( Cmd_CommandExecute( pAbc, Command ) )
+    {
+        fprintf( stdout, "Cannot execute command \"%s\".\n", Command );
+        return 1;
+    }
+
+    // print_stats
+    sprintf( Command, "print_stats" );
+    printf(">> print_stats\n");
+    if ( Cmd_CommandExecute( pAbc, Command ) )
+    {
+        fprintf( stdout, "Cannot execute command \"%s\".\n", Command );
+        return 1;
+    }
+
+    // synthesize
+    sprintf( Command, "balance; rewrite -l; refactor -l; balance; rewrite -l; rewrite -lz; balance; refactor -lz; rewrite -lz; balance" );
+    printf( ">> balance; rewrite -l; refactor -l; balance; rewrite -l; rewrite -lz; balance; refactor -lz; rewrite -lz; balance\n" );
+    if ( Cmd_CommandExecute( pAbc, Command ) )
+    {
+        fprintf( stdout, "Cannot execute command \"%s\".\n", Command );
+        return 1;
+    }
+
+    // print_stats
+    sprintf( Command, "print_stats" );
+    printf(">> print_stats\n");
+    if ( Cmd_CommandExecute( pAbc, Command ) )
+    {
+        fprintf( stdout, "Cannot execute command \"%s\".\n", Command );
+        return 1;
+    }
+
+    // write the result in blif
+    sprintf( Command, "write_blif result1.blif" );
+    printf( ">> write_blif result1.blif\n" );
+    if ( Cmd_CommandExecute( pAbc, Command ) )
+    {
+        fprintf( stdout, "Cannot execute command \"%s\".\n", Command );
+        return 1;
+    }
+
+    // stop the ABC framework
+    Abc_Stop();
+
     return 0;
 }
