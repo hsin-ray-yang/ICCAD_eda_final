@@ -138,7 +138,10 @@ int main( int argc, char** argv )
     write_blif(0,gr_blif,rf,&input_rf, &input_rf_size, &output_rf, &output_rf_size);
     fclose(rf);
 
-    
+    // add input buffer
+    input_blif(input_gf, input_gf_size, gr_blif);
+    // add output miter
+    miter_blif(output_gf, output_gf_size, gr_blif);
 
     printf("INPUT gf :\n");
     for(int i=0;i< input_gf_size;++i){
