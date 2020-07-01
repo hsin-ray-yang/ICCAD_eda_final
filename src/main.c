@@ -215,8 +215,17 @@ int main( int argc, char** argv )
     }
 
     // print_stats
-    sprintf( Command, "print_stats" );
-    printf(">> print_stats\n");
+    sprintf( Command, "strash" );
+    printf(">> strash\n");
+    if ( Cmd_CommandExecute( pAbc, Command ) )
+    {
+        fprintf( stdout, "Cannot execute command \"%s\".\n", Command );
+        return 1;
+    }
+
+    // synthesize
+    sprintf( Command, "balance; rewrite -l; refactor -l; balance; rewrite -l; rewrite -lz; balance; refactor -lz; rewrite -lz; balance" );
+    printf( ">> balance; rewrite -l; refactor -l; balance; rewrite -l; rewrite -lz; balance; refactor -lz; rewrite -lz; balance\n" );
     if ( Cmd_CommandExecute( pAbc, Command ) )
     {
         fprintf( stdout, "Cannot execute command \"%s\".\n", Command );
@@ -224,8 +233,17 @@ int main( int argc, char** argv )
     }
 
     // write the result in blif
-    sprintf( Command, "write_blif result1.blif" );
-    printf( ">> write_blif result1.blif\n" );
+    sprintf( Command, "write_blif result.blif" );
+    printf( ">> write_blif result.blif\n" );
+    if ( Cmd_CommandExecute( pAbc, Command ) )
+    {
+        fprintf( stdout, "Cannot execute command \"%s\".\n", Command );
+        return 1;
+    }
+
+    // write the result in blif
+    sprintf( Command, "dsat;write_cex result.txt" );
+    printf( ">> dsat;write_cex result.txt\n" );
     if ( Cmd_CommandExecute( pAbc, Command ) )
     {
         fprintf( stdout, "Cannot execute command \"%s\".\n", Command );
