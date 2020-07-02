@@ -70,7 +70,7 @@ int main( int argc, char** argv )
     // variables
     char * filename_gf;
     char * filename_rf;
-    // char * filename_out; // use afterward
+    char * filename_out; // use afterward
 
     char ** output_gf;
     char ** output_rf;
@@ -80,6 +80,8 @@ int main( int argc, char** argv )
     size_t output_rf_size;
     size_t input_gf_size;
     size_t input_rf_size;
+    clock_t  clk, clkend;
+    clk = clock();
 
     //////////////////////////////////////////////////////////////////////////
     // get the input file names
@@ -91,7 +93,7 @@ int main( int argc, char** argv )
     }
     filename_gf = argv[1];
     filename_rf = argv[2];
-    // filename_out = argv[3]; // use afterward
+    filename_out = argv[3]; // use afterward
 
     //////////////////////////////////////////////////////////////////////////
     // open gf rf file
@@ -146,31 +148,13 @@ int main( int argc, char** argv )
     fclose(gf);
     fclose(rf);
 
-    // free molloc array
-    for(int i=0;i< input_gf_size;++i){
-        free(input_gf[i]);
-    }
-    free(input_gf);
-    for(int i=0;i< output_gf_size;++i){
-        free(output_gf[i]);
-    }
-    free(output_gf);
-    for(int i=0;i< input_rf_size;++i){
-        free(input_rf[i]);
-    }
-    free(input_rf);
-    for(int i=0;i< output_rf_size;++i){
-        free(output_rf[i]);
-    }
-    free(output_rf);
-
     //////////////////////////////////////////////////////////////////////////
     // environment setup
     if( remove("./result.txt") ==0 ){
         printf("File \"./result.txt\"removed successfully\n");
     }
     else {
-        printf("Waring! cannot delete \"./result.txt\"\n");
+        printf("(Maybe)Warning! cannot delete \"./result.txt\"\n");
     }
 
 
@@ -319,5 +303,50 @@ int main( int argc, char** argv )
     // stop the ABC framework
     Abc_Stop();
 
+
+    // create FINAL file
+    FILE *result;
+    FILE *outputfile;
+    outputfile = fopen(filename_out,"w");
+    result = fopen("./result.txt", "r");
+    if (result!=NULL){
+        char ch;
+        fprintf(outputfile,"NEQ\n");
+        for(int i=0;i< input_gf_size;++i){
+            ch = (char)fgetc(result);
+            fprintf(outputfile, "%s %c\n", input_gf[i],ch);
+        }
+        fclose(result);
+        fclose(outputfile);
+        if( remove("./result.txt") !=0 ){
+            printf("Warning : \"./result.txt\"removed badly\n");
+        }
+
+    }
+    else {
+        fprintf(outputfile,"EQ");
+        fclose(outputfile);
+    }
+
+    // free molloc array
+    for(int i=0;i< input_gf_size;++i){
+        free(input_gf[i]);
+    }
+    free(input_gf);
+    for(int i=0;i< output_gf_size;++i){
+        free(output_gf[i]);
+    }
+    free(output_gf);
+    for(int i=0;i< input_rf_size;++i){
+        free(input_rf[i]);
+    }
+    free(input_rf);
+    for(int i=0;i< output_rf_size;++i){
+        free(output_rf[i]);
+    }
+    free(output_rf);
+    
+    clkend = clock() - clk;
+    printf("---------\nuse %.3f seconds.\n",(float)clkend/1000000 );
     return 0;
 }
