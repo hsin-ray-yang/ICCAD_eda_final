@@ -164,6 +164,15 @@ int main( int argc, char** argv )
     }
     free(output_rf);
 
+    //////////////////////////////////////////////////////////////////////////
+    // environment setup
+    if( remove("./result.txt") ==0 ){
+        printf("File \"./result.txt\"removed successfully\n");
+    }
+    else {
+        printf("Waring! cannot delete \"./result.txt\"\n");
+    }
+
 
     //////////////////////////////////////////////////////////////////////////
     // variable of the ABC framework
