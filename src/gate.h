@@ -58,6 +58,18 @@ void writeXORstr(int n, int ones, int onoff, char* head, FILE * outFile)
     }
 }
 
+void const_blif(FILE * outFile)
+{
+    fprintf(outFile, ".names 1'b1M_gf\n1\n");
+    fprintf(outFile, ".names 1'b1L_gf\n1\n");
+    fprintf(outFile, ".names 1'b1M_rf\n1\n");
+    fprintf(outFile, ".names 1'b1L_rf\n1\n");
+    fprintf(outFile, ".names 1'b0M_gf\n");
+    fprintf(outFile, ".names 1'b0L_gf\n");
+    fprintf(outFile, ".names 1'b0M_rf\n");
+    fprintf(outFile, ".names 1'b0L_rf\n");
+}
+
 void gate_blif(int GR, Gate g, char** IOname, int n, FILE * outFile)
 {
     /* GR = 0 if revised; GR = 1 if golden */

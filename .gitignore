@@ -36,3 +36,4 @@ src/*.o
 **/.DS_store
 .vscode
 bin/
+result.*

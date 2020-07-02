@@ -137,6 +137,8 @@ int main( int argc, char** argv )
     write_blif(1,gr_blif,gf,&input_gf, &input_gf_size, &output_gf, &output_gf_size);
     write_blif(0,gr_blif,rf,&input_rf, &input_rf_size, &output_rf, &output_rf_size);
 
+    // add const gates
+    const_blif(gr_blif);
     // add input buffer
     input_blif(input_gf, input_gf_size, gr_blif);
     // add output miter
@@ -178,6 +180,22 @@ int main( int argc, char** argv )
         fprintf( stdout, "Cannot execute command \"%s\".\n", Command );
         return 1;
     }
+
+    // while(1){
+    //     printf("\n>> ");
+    //     fgets(Command,1000,stdin);
+    //     printf("%s\n",Command );
+    //     if ( Cmd_CommandExecute( pAbc, Command ) )
+    //     {
+    //         fprintf( stdout, "Cannot execute command \"%s\".\n", Command );
+    //         printf("continue?(y/n)");
+    //         scanf("%c",&exit);
+    //         if(exit == 'n'){
+    //             break;
+    //         }
+
+    //     }
+    // }
 
     //standard script resyn
     sprintf( Command, "balance" );
