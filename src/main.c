@@ -151,6 +151,9 @@ int main( int argc, char** argv )
     fclose(gf);
     fclose(rf);
 
+    printf("Parse to BLIF  Time =     %.2f sec\n", (float)(clock() - clk_temp)/1000000) ;
+    clk_temp = clock();
+
     //////////////////////////////////////////////////////////////////////////
     // environment setup
     if( remove("./result.txt") ==0 ){
@@ -173,31 +176,59 @@ int main( int argc, char** argv )
     Abc_Start();
     pAbc = Abc_FrameGetGlobalFrame();
 
-    // read the file
-    
-    sprintf( Command, "read %s", filename_gr_blif );
-    Cmd_CommandExecute( pAbc, Command );
-    
-    Cmd_CommandExecute( pAbc, "strash" );
-    Cmd_CommandExecute( pAbc, "dc2" );
-    Cmd_CommandExecute( pAbc, "dfraig" );
-    Cmd_CommandExecute( pAbc, "dsat;write_cex result.txt" );
+    int abc = 1;
+    //////////////////////////////////////////////////////////////////////////
+    // ABC script
+    if(abc){
+        sprintf( Command, "read %s", filename_gr_blif );
+        Cmd_CommandExecute( pAbc, Command );
+        printf("Read BLIF      Time =     %.2f sec\n", (float)(clock() - clk_temp)/1000000) ;
+        clk_temp = clock();
+        
+        Cmd_CommandExecute( pAbc, "strash" );
+        printf("strash         Time =     %.2f sec\n", (float)(clock() - clk_temp)/1000000) ;
+        clk_temp = clock();
 
-    // while(1){
-    //     printf("\n>> ");
-    //     fgets(Command,1000,stdin);
-    //     printf("%s\n",Command );
-    //     if ( Cmd_CommandExecute( pAbc, Command ) )
-    //     {
-    //         fprintf( stdout, "Cannot execute command \"%s\".\n", Command );
-    //         printf("continue?(y/n)");
-    //         scanf("%c",&exit);
-    //         if(exit == 'n'){
-    //             break;
-    //         }
+        Cmd_CommandExecute( pAbc, "dc2" );
+        printf("dc2            Time =     %.2f sec\n", (float)(clock() - clk_temp)/1000000) ;
+        clk_temp = clock();
 
-    //     }
-    // }
+        Cmd_CommandExecute( pAbc, "dfraig" );
+        printf("dfraig         Time =     %.2f sec\n", (float)(clock() - clk_temp)/1000000) ;
+        clk_temp = clock();
+
+        Cmd_CommandExecute( pAbc, "write_blif result.blif" );
+        printf("write_blif     Time =     %.2f sec\n", (float)(clock() - clk_temp)/1000000) ;
+        clk_temp = clock();
+
+        Cmd_CommandExecute( pAbc, "dsat;write_cex result.txt" );
+    }
+    //////////////////////////////////////////////////////////////////////////
+
+    //////////////////////////////////////////////////////////////////////////
+    // user input command
+    else{
+        sprintf( Command, "read %s", filename_gr_blif );
+        Cmd_CommandExecute( pAbc, Command );
+        printf("Read BLIF      Time =     %.2f sec\n", (float)(clock() - clk_temp)/1000000) ;
+        clk_temp = clock();
+        char buf[10];
+        while(1){
+            printf("\n>> ");
+            fgets(Command,1000,stdin);
+            printf("%s\n",Command );
+            if ( Cmd_CommandExecute( pAbc, Command ) )
+            {
+                fprintf( stdout, "Cannot execute command \"%s\".\n", Command );
+                printf("continue?(y/n)");
+                scanf("%c",buf);
+                if(strncmp(buf, "n", 1) ==0){
+                    break;
+                }
+            }
+        }
+    }
+    //////////////////////////////////////////////////////////////////////////
 
     // stop the ABC framework
     Abc_Stop();
