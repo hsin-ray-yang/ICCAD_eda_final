@@ -140,7 +140,6 @@ int main( int argc, char** argv )
     // add output miter
     miter_blif(output_gf, output_gf_size, gr_blif);
     fprintf(gr_blif, ".end \n");
-    printf("\n\n");
 
     // free FILE pointer
     fclose(gr_blif);
@@ -187,33 +186,55 @@ int main( int argc, char** argv )
         return 1;
     }
 
-    // balance
+    //standard script resyn
     sprintf( Command, "balance" );
-    printf(">> balance\n" );
+    printf(">> %s\n",Command);
     if ( Cmd_CommandExecute( pAbc, Command ) )
     {
         fprintf( stdout, "Cannot execute command \"%s\".\n", Command );
         return 1;
     }
 
-    // print_stats
-    sprintf( Command, "print_stats" );
-    printf(">> print_stats\n");
+    sprintf( Command, "rewrite" );
+    printf(">> %s\n",Command);
     if ( Cmd_CommandExecute( pAbc, Command ) )
     {
         fprintf( stdout, "Cannot execute command \"%s\".\n", Command );
         return 1;
     }
 
-    // synthesize
-    sprintf( Command, "balance; rewrite -l; refactor -l; balance; rewrite -l; rewrite -lz; balance; refactor -lz; rewrite -lz; balance" );
-    printf( ">> balance; rewrite -l; refactor -l; balance; rewrite -l; rewrite -lz; balance; refactor -lz; rewrite -lz; balance\n" );
+    sprintf( Command, "rewrite -z" );
+    printf(">> %s\n",Command);
     if ( Cmd_CommandExecute( pAbc, Command ) )
     {
         fprintf( stdout, "Cannot execute command \"%s\".\n", Command );
         return 1;
     }
 
+    sprintf( Command, "balance" );
+    printf(">> %s\n",Command);
+    if ( Cmd_CommandExecute( pAbc, Command ) )
+    {
+        fprintf( stdout, "Cannot execute command \"%s\".\n", Command );
+        return 1;
+    }
+
+    sprintf( Command, "rewrite -z" );
+    printf(">> %s\n",Command);
+    if ( Cmd_CommandExecute( pAbc, Command ) )
+    {
+        fprintf( stdout, "Cannot execute command \"%s\".\n", Command );
+        return 1;
+    }
+
+    sprintf( Command, "balance" );
+    printf(">> %s\n",Command);
+    if ( Cmd_CommandExecute( pAbc, Command ) )
+    {
+        fprintf( stdout, "Cannot execute command \"%s\".\n", Command );
+        return 1;
+    }
+/*
     // print_stats
     sprintf( Command, "strash" );
     printf(">> strash\n");
@@ -223,6 +244,24 @@ int main( int argc, char** argv )
         return 1;
     }
 
+    // balance
+    sprintf( Command, "fraig_sweep" );
+    printf(">> fraig_sweep\n" );
+    if ( Cmd_CommandExecute( pAbc, Command ) )
+    {
+        fprintf( stdout, "Cannot execute command \"%s\".\n", Command );
+        return 1;
+    }
+
+    // cleanup
+    sprintf( Command, "cleanup;" );
+    printf(">> cleanup;\n");
+    if ( Cmd_CommandExecute( pAbc, Command ) )
+    {
+        fprintf( stdout, "Cannot execute command \"%s\".\n", Command );
+        return 1;
+    }
+
     // synthesize
     sprintf( Command, "balance; rewrite -l; refactor -l; balance; rewrite -l; rewrite -lz; balance; refactor -lz; rewrite -lz; balance" );
     printf( ">> balance; rewrite -l; refactor -l; balance; rewrite -l; rewrite -lz; balance; refactor -lz; rewrite -lz; balance\n" );
@@ -232,6 +271,24 @@ int main( int argc, char** argv )
         return 1;
     }
 
+    // cleanup
+    sprintf( Command, "cleanup;" );
+    printf(">> cleanup;\n");
+    if ( Cmd_CommandExecute( pAbc, Command ) )
+    {
+        fprintf( stdout, "Cannot execute command \"%s\".\n", Command );
+        return 1;
+    }
+
+    // synthesize
+    sprintf( Command, "balance; rewrite -l; refactor -l; balance; rewrite -l; rewrite -lz; balance; refactor -lz; rewrite -lz; balance" );
+    printf( ">> balance; rewrite -l; refactor -l; balance; rewrite -l; rewrite -lz; balance; refactor -lz; rewrite -lz; balance\n" );
+    if ( Cmd_CommandExecute( pAbc, Command ) )
+    {
+        fprintf( stdout, "Cannot execute command \"%s\".\n", Command );
+        return 1;
+    }
+*/
     // write the result in blif
     sprintf( Command, "write_blif result.blif" );
     printf( ">> write_blif result.blif\n" );
