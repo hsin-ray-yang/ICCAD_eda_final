@@ -303,7 +303,7 @@ void gate_blif(int GR, Gate g, char** IOname, int n, FILE * outFile)
         fprintf(outFile, " ");
         writeIOstring(0, "L");
         fprintf(outFile, "\n");
-        fprintf(outFile, "1- 1\n-1 1\n");
+        fprintf(outFile, "00 0\n");
         break;
     
     case MUX:

@@ -80,8 +80,9 @@ int main( int argc, char** argv )
     size_t output_rf_size;
     size_t input_gf_size;
     size_t input_rf_size;
-    clock_t  clk, clkend;
+    clock_t  clk, clk_temp, clkend;
     clk = clock();
+    clk_temp = clk;
 
     //////////////////////////////////////////////////////////////////////////
     // get the input file names
@@ -173,13 +174,14 @@ int main( int argc, char** argv )
     pAbc = Abc_FrameGetGlobalFrame();
 
     // read the file
+    
     sprintf( Command, "read %s", filename_gr_blif );
-    printf(">> read %s\n", filename_gr_blif );
-    if ( Cmd_CommandExecute( pAbc, Command ) )
-    {
-        fprintf( stdout, "Cannot execute command \"%s\".\n", Command );
-        return 1;
-    }
+    Cmd_CommandExecute( pAbc, Command );
+    
+    Cmd_CommandExecute( pAbc, "strash" );
+    Cmd_CommandExecute( pAbc, "dc2" );
+    Cmd_CommandExecute( pAbc, "dfraig" );
+    Cmd_CommandExecute( pAbc, "dsat;write_cex result.txt" );
 
     // while(1){
     //     printf("\n>> ");
@@ -196,127 +198,6 @@ int main( int argc, char** argv )
 
     //     }
     // }
-
-    //standard script resyn
-    sprintf( Command, "balance" );
-    printf(">> %s\n",Command);
-    if ( Cmd_CommandExecute( pAbc, Command ) )
-    {
-        fprintf( stdout, "Cannot execute command \"%s\".\n", Command );
-        return 1;
-    }
-
-    sprintf( Command, "rewrite" );
-    printf(">> %s\n",Command);
-    if ( Cmd_CommandExecute( pAbc, Command ) )
-    {
-        fprintf( stdout, "Cannot execute command \"%s\".\n", Command );
-        return 1;
-    }
-
-    sprintf( Command, "rewrite -z" );
-    printf(">> %s\n",Command);
-    if ( Cmd_CommandExecute( pAbc, Command ) )
-    {
-        fprintf( stdout, "Cannot execute command \"%s\".\n", Command );
-        return 1;
-    }
-
-    sprintf( Command, "balance" );
-    printf(">> %s\n",Command);
-    if ( Cmd_CommandExecute( pAbc, Command ) )
-    {
-        fprintf( stdout, "Cannot execute command \"%s\".\n", Command );
-        return 1;
-    }
-
-    sprintf( Command, "rewrite -z" );
-    printf(">> %s\n",Command);
-    if ( Cmd_CommandExecute( pAbc, Command ) )
-    {
-        fprintf( stdout, "Cannot execute command \"%s\".\n", Command );
-        return 1;
-    }
-
-    sprintf( Command, "balance" );
-    printf(">> %s\n",Command);
-    if ( Cmd_CommandExecute( pAbc, Command ) )
-    {
-        fprintf( stdout, "Cannot execute command \"%s\".\n", Command );
-        return 1;
-    }
-/*
-    // print_stats
-    sprintf( Command, "strash" );
-    printf(">> strash\n");
-    if ( Cmd_CommandExecute( pAbc, Command ) )
-    {
-        fprintf( stdout, "Cannot execute command \"%s\".\n", Command );
-        return 1;
-    }
-
-    // balance
-    sprintf( Command, "fraig_sweep" );
-    printf(">> fraig_sweep\n" );
-    if ( Cmd_CommandExecute( pAbc, Command ) )
-    {
-        fprintf( stdout, "Cannot execute command \"%s\".\n", Command );
-        return 1;
-    }
-
-    // cleanup
-    sprintf( Command, "cleanup;" );
-    printf(">> cleanup;\n");
-    if ( Cmd_CommandExecute( pAbc, Command ) )
-    {
-        fprintf( stdout, "Cannot execute command \"%s\".\n", Command );
-        return 1;
-    }
-
-    // synthesize
-    sprintf( Command, "balance; rewrite -l; refactor -l; balance; rewrite -l; rewrite -lz; balance; refactor -lz; rewrite -lz; balance" );
-    printf( ">> balance; rewrite -l; refactor -l; balance; rewrite -l; rewrite -lz; balance; refactor -lz; rewrite -lz; balance\n" );
-    if ( Cmd_CommandExecute( pAbc, Command ) )
-    {
-        fprintf( stdout, "Cannot execute command \"%s\".\n", Command );
-        return 1;
-    }
-
-    // cleanup
-    sprintf( Command, "cleanup;" );
-    printf(">> cleanup;\n");
-    if ( Cmd_CommandExecute( pAbc, Command ) )
-    {
-        fprintf( stdout, "Cannot execute command \"%s\".\n", Command );
-        return 1;
-    }
-
-    // synthesize
-    sprintf( Command, "balance; rewrite -l; refactor -l; balance; rewrite -l; rewrite -lz; balance; refactor -lz; rewrite -lz; balance" );
-    printf( ">> balance; rewrite -l; refactor -l; balance; rewrite -l; rewrite -lz; balance; refactor -lz; rewrite -lz; balance\n" );
-    if ( Cmd_CommandExecute( pAbc, Command ) )
-    {
-        fprintf( stdout, "Cannot execute command \"%s\".\n", Command );
-        return 1;
-    }
-*/
-    // write the result in blif
-    sprintf( Command, "write_blif result.blif" );
-    printf( ">> write_blif result.blif\n" );
-    if ( Cmd_CommandExecute( pAbc, Command ) )
-    {
-        fprintf( stdout, "Cannot execute command \"%s\".\n", Command );
-        return 1;
-    }
-
-    // write the result in blif
-    sprintf( Command, "dsat;write_cex result.txt" );
-    printf( ">> dsat;write_cex result.txt\n" );
-    if ( Cmd_CommandExecute( pAbc, Command ) )
-    {
-        fprintf( stdout, "Cannot execute command \"%s\".\n", Command );
-        return 1;
-    }
 
     // stop the ABC framework
     Abc_Stop();
