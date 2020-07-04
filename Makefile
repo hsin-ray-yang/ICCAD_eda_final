@@ -10,7 +10,7 @@ bin/xec : main.o
 	$(CC) -g -o $@ $< $(LIBFLAGS)
 
 main.o : src/main.c src/gate.h
-	gcc -Wall $(DBGFLAGS) $(CFLAGS) $< -o $@
+	gcc $(OPTFLAGS) -Wall $(DBGFLAGS) $(CFLAGS) $< -o $@
 
 clean:
 	rm -rf *.o bin/*

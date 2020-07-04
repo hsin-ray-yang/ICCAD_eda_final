@@ -114,19 +114,21 @@ int main( int argc, char** argv )
 
     //////////////////////////////////////////////////////////////////////////
     // read gf & rf file and write gf_rf.blif
-    char *last_rf = strrchr(filename_rf, '/');
-    size_t last_rf_size = (int)strlen(last_rf+1)-2;
 
-    int gr_len = strlen(filename_gf) + 1 + last_rf_size + 3 + 1; // gf.v -> gf_rf.blif
-    char filename_gr_blif[ gr_len ];
+    // char *last_rf = strrchr(filename_rf, '/');
+    // size_t last_rf_size = (int)strlen(last_rf+1)-2;
 
-    memset(filename_gr_blif, '\0', gr_len);
+    // int gr_len = strlen(filename_gf) + 1 + last_rf_size + 3 + 1; // gf.v -> gf_rf.blif
+    // char filename_gr_blif[ gr_len ];
 
-    strncat(filename_gr_blif,filename_gf,gr_len-7-last_rf_size);
-    strcat(filename_gr_blif,"_");
-    strncat(filename_gr_blif,last_rf+1,last_rf_size);
-    strcat(filename_gr_blif,".blif");
+    // memset(filename_gr_blif, '\0', gr_len);
 
+    // strncat(filename_gr_blif,filename_gf,gr_len-7-last_rf_size);
+    // strcat(filename_gr_blif,"_");
+    // strncat(filename_gr_blif,last_rf+1,last_rf_size);
+    // strcat(filename_gr_blif,".blif");
+
+    char filename_gr_blif[] = "./gf_rf.blif";
     FILE * gr_blif = fopen(filename_gr_blif,"w");
 
     fprintf(gr_blif,"# .blif file of \"%s\" and \"%s\" written by xec file.\n", filename_gf, filename_rf );
@@ -156,11 +158,13 @@ int main( int argc, char** argv )
 
     //////////////////////////////////////////////////////////////////////////
     // environment setup
-    if( remove("./result.txt") ==0 ){
-        printf("File \"./result.txt\"removed successfully\n");
+    char sat_result[] = "./sat_result";
+    if(strcmp(sat_result, filename_out) == 0){ strcat(sat_result, "1"); }
+    if( remove(sat_result) ==0 ){
+        printf("File \"%s\"removed successfully\n", sat_result);
     }
     else {
-        printf("(Maybe)Warning! cannot delete \"./result.txt\"\n");
+        printf("(Maybe)Warning! cannot delete \"%s\"\n", sat_result);
     }
 
 
@@ -201,7 +205,8 @@ int main( int argc, char** argv )
         printf("write_blif     Time =     %.2f sec\n", (float)(clock() - clk_temp)/1000000) ;
         clk_temp = clock();
 
-        Cmd_CommandExecute( pAbc, "dsat;write_cex result.txt" );
+        sprintf( Command, "dsat;write_cex %s", sat_result);
+        Cmd_CommandExecute( pAbc, Command );
     }
     //////////////////////////////////////////////////////////////////////////
 
@@ -238,7 +243,7 @@ int main( int argc, char** argv )
     FILE *result;
     FILE *outputfile;
     outputfile = fopen(filename_out,"w");
-    result = fopen("./result.txt", "r");
+    result = fopen(sat_result, "r");
     if (result!=NULL){
         char ch;
         fprintf(outputfile,"NEQ\n");
@@ -248,7 +253,7 @@ int main( int argc, char** argv )
         }
         fclose(result);
         fclose(outputfile);
-        if( remove("./result.txt") !=0 ){
+        if( remove(sat_result) !=0 ){
             printf("Warning : \"./result.txt\"removed badly\n");
         }
 
