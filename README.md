@@ -14,10 +14,8 @@ For `xec`:
     make
 
 ## execute
-For `demo.out`:
-
-    ./demo.out <input_file>
-
 For `xec`:
 
-    ./bin/xec <input.v> <output.blif>
+    ./bin/xec <golden.v> <revise.v> <output_path> 
+    
+The program will create a result.blif in current directory and output file in the path we give.
